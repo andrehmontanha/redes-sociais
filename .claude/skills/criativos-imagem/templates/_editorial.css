@@ -1,5 +1,6 @@
 /* Linha editorial: grid de 12 colunas sobre a margem do kit, cabeçalho (logo +
-   rótulo com fio), rodapé com fio, contador e barra de progresso. Nenhuma cor ou
+   rótulo com fio), rodapé com fio, assinatura e "arraste". REGRA DO ESTÚDIO: nenhuma contagem de
+   peça/slide/cena, em nenhuma forma. Nenhuma cor ou
    fonte própria: tudo sai das variáveis do brand kit. O tema troca só o par
    fundo/texto entre as cores do kit (fundo, claro, primária, secundária). */
 
@@ -30,19 +31,15 @@
 .ed-titulo { font-family: var(--fonte-titulo); font-weight: var(--peso-titulo); text-transform: var(--caixa-titulo);
   line-height: .98; letter-spacing: -0.025em; overflow: hidden; text-wrap: balance; }
 .ed-texto { font-size: 34px; line-height: 1.38; color: var(--suave); overflow: hidden; text-wrap: pretty; }
-.ed-numero { font-family: var(--fonte-titulo); font-weight: var(--peso-titulo); font-size: 150px; line-height: .8;
-  letter-spacing: -0.04em; color: transparent; -webkit-text-stroke: 2.5px var(--acento); }
+.ed-marca { position: absolute; left: var(--margem); top: 262px; width: 88px; height: 12px; border-radius: 6px; background: var(--acento); }
 
-/* rodapé: fio, contador e progresso */
+/* rodapé: fio, assinatura e "arraste" — sem contagem */
 .ed-rodape { position: absolute; left: var(--margem); right: var(--margem); bottom: 0; height: 107px;
   border-top: 1.5px solid var(--linha); display: flex; align-items: center; justify-content: space-between;
   font-family: var(--fonte-rotulo); font-weight: var(--peso-rotulo); font-size: 21px; letter-spacing: .12em; }
 .formato-story .ed-rodape { bottom: 270px; }
-.ed-contador { color: var(--suave); font-variant-numeric: tabular-nums; }
+.ed-assinatura { color: var(--suave); }
 .ed-arraste { color: var(--acento); text-transform: uppercase; }
-.ed-progresso { display: flex; gap: 8px; }
-.ed-progresso i { display: block; width: 26px; height: 5px; border-radius: 3px; background: var(--linha); }
-.ed-progresso i.ativo { width: 52px; background: var(--acento); }
 
 /* palco da ilustração: painel arredondado ou círculo um tom acima do fundo */
 .ed-palco { position: absolute; background: var(--painel); border-radius: calc(var(--raio) * 2);
@@ -62,8 +59,8 @@
 .ed-capa-topo .ed-palco { right: 20px; bottom: 150px; width: 600px; height: 560px; }
 
 /* ponto (peça de conteúdo) */
-.ed-ponto .ed-numero { position: absolute; left: var(--margem); top: 250px; }
-.ed-ponto .ed-titulo { position: absolute; left: var(--margem); width: 500px; top: 420px; max-height: 470px; font-size: 80px; }
+.ed-ponto .ed-marca { position: absolute; left: var(--margem); top: 262px; width: 88px; height: 12px; border-radius: 6px; background: var(--acento); }
+.ed-ponto .ed-titulo { position: absolute; left: var(--margem); width: 500px; top: 320px; max-height: 570px; font-size: 84px; }
 .ed-ponto .ed-palco { right: var(--margem); top: 250px; width: 420px; height: 640px; }
 .ed-ponto .ed-baixo { position: absolute; left: var(--margem); right: var(--margem); top: 950px; bottom: 150px;
   border-top: 1.5px solid var(--linha); padding-top: 40px; display: flex; flex-direction: column; gap: 26px; }

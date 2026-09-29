@@ -9,7 +9,6 @@
     {{#itens_check}}<li><span class="ed-caixa"></span><div><div class="ed-item-t">{{t}}</div>{{#d}}<div class="ed-item-d">{{d}}</div>{{/d}}</div></li>{{/itens_check}}
   </ul>
   <div class="ed-rodape">
-    <span class="ed-contador">{{#carrossel}}{{indice_fmt}}/{{total_fmt}}{{/carrossel}}{{^carrossel}}{{assinatura}}{{/carrossel}}</span>
-    {{#carrossel}}<span class="ed-progresso">{{#passos}}<i class="{{classe}}"></i>{{/passos}}</span>{{/carrossel}}
+    <span class="ed-assinatura">{{assinatura}}</span>
   </div>
 </div>

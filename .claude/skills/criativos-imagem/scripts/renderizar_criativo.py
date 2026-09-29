@@ -154,6 +154,9 @@ def montar_html(peca, idx, total, kit, formato, base: Path, base_kit: Path):
         disponiveis = ", ".join(sorted(p.stem for p in TEMPLATES.glob("*.html")))
         sys.exit(f"template inexistente: {peca['template']} (disponíveis: {disponiveis})")
     campos = dict(peca.get("campos", {}))
+    proibidos = {"numero", "contador", "indice", "total", "progresso"} & set(campos)
+    if proibidos:
+        sys.exit(f"campo(s) {', '.join(sorted(proibidos))}: o estúdio não usa contagem de peça/slide/cena")
     for chave in [k for k in campos if k == "foto" or k.startswith("foto_")]:
         campos[chave] = resolver_foto(campos[chave], base, base_kit)
     elem, comp = kit["elementos"], kit["composicao"]
@@ -175,14 +178,14 @@ def montar_html(peca, idx, total, kit, formato, base: Path, base_kit: Path):
     if contato.get("whatsapp"):
         campos.setdefault("whatsapp", contato["whatsapp"])
     campos.update({
-        "indice_fmt": f"{idx:02d}", "total_fmt": f"{total:02d}", "tema": tema,
-        "indice": idx, "total": total, "carrossel": total > 1 and formato != "story",
+        # REGRA DO ESTÚDIO: nada de contagem (01/06, barra de progresso, número de peça).
+        # Índice e total não chegam aos templates de propósito.
+        "tema": tema, "carrossel": total > 1 and formato != "story", "primeira": idx == 1,
         "posicao_logo": elem.get("logo_posicao", "topo-esquerda"),
         "classe_alinhamento": "centro" if comp.get("alinhamento") == "centro" else "",
         f"tratamento_{comp.get('texto_sobre_foto', 'degrade')}": True,
         "formato": formato,
     })
-    campos["passos"] = [{"classe": "ativo" if i == idx else ""} for i in range(1, total + 1)]
     if isinstance(campos.get("itens"), list) and campos["itens"]:
         campos["tem_itens"] = True
         campos["itens_check"] = [dict(zip(("t", "d"), (x.split(" — ", 1) + [""])[:2])) for x in campos["itens"]]

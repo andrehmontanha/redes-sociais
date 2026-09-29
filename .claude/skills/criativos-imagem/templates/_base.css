@@ -16,7 +16,7 @@ body { width: var(--largura); height: var(--altura); overflow: hidden; }
    Instagram cobre ~250 px no topo e ~300 px na base. */
 .area {
   position: absolute; inset: var(--margem);
-  bottom: calc(var(--margem) + 48px); /* espaço do rodapé (assinatura e contador) */
+  bottom: calc(var(--margem) + 48px); /* espaço do rodapé (assinatura) */
   display: flex; flex-direction: column; gap: 28px;
 }
 .formato-story .area { top: 250px; bottom: 340px; }
@@ -62,7 +62,6 @@ body { width: var(--largura); height: var(--altura); overflow: hidden; }
   display: flex; justify-content: space-between; font-size: 24px; opacity: .8;
 }
 .formato-story .rodape { bottom: 280px; }
-.contador { font-variant-numeric: tabular-nums; }
 .arraste { font-size: 26px; font-weight: 600; color: var(--primaria); }
 
 /* Sobre foto, tudo que é texto usa a cor de texto-sobre-foto — a primária da

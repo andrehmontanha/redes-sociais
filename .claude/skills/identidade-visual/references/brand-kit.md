@@ -54,6 +54,8 @@ claro quebra a grade mesmo com a tipografia certa.
   usada automaticamente nos temas claros da linha editorial.
 - `assinatura`: o @ ou o site no rodapé? Escreva o texto exato, ou `nenhuma`.
 - `recorrentes`: lista curta — "selo circular com o ano de fundação", "moldura fina de 12 px na cor primária".
+  Nunca contador de peças (01/06), barra de progresso ou numeração de slide: regra do estúdio.
+- `proibidos` (opcional): o que não se repete nas peças, com quem decidiu e quando.
 
 ## voz
 

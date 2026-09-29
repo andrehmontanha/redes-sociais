@@ -110,7 +110,16 @@ def main():
         if n != 6:
             falhas.append("contagem de JPEG")
 
-        # linha editorial: ênfase com asteriscos, temas, contador, card de contato
+        # regra do estúdio: nenhuma contagem (01/06, progresso, número de peça) em template algum
+        import re
+        tpl = SK / "criativos-imagem" / "templates"
+        com_contagem = [t.name for t in sorted(tpl.glob("*.*"))
+                        if re.search(r"\{\{\s*(indice|total|n)\b|contador|progresso|ed-numero", t.read_text())]
+        print(("✓" if not com_contagem else "✗"), "nenhum template com contagem", com_contagem or "")
+        if com_contagem:
+            falhas.append("template com contagem")
+
+        # linha editorial: ênfase com asteriscos, temas, card de contato
         k = json.loads(kit.read_text())
         k["cores"]["papeis"].update({"secundaria": "#d67841", "claro": "#fffaf2"})
         k["contato"] = {"whatsapp": "(11) 90000-0000"}
@@ -120,7 +129,7 @@ def main():
         (c3 / "roteiro.json").write_text(json.dumps({"brand_kit": "../../brand-kit.json", "formato": "feed", "pecas": [
             {"template": "capa-editorial", "campos": {"rotulo": "Guia", "titulo": "Seu domingo *começa aqui*",
                                                       "subtitulo": "3 ideias", "foto": "../../referencias/cliente/post02.jpg"}},
-            {"template": "ponto-ilustrado", "campos": {"numero": "01", "titulo": "Café *da fazenda*", "texto": "Servido até 11h.",
+            {"template": "ponto-ilustrado", "campos": {"titulo": "Café *da fazenda*", "texto": "Servido até 11h.",
                                                        "itens": ["Pão de queijo", "Frutas"], "palco": "circulo",
                                                        "foto": "../../referencias/cliente/post04.jpg"}},
             {"template": "checklist", "campos": {"tema": "claro", "titulo": "Para *levar*",
@@ -129,10 +138,23 @@ def main():
         ]}, ensure_ascii=False))
         rodar("renderiza linha editorial", [PY, render, c3 / "roteiro.json"])
         html_cta = (c3 / "render" / "04-cta-card.html").read_text()
-        ok = "<em>reservar?</em>" in html_cta and "(11) 90000-0000" in html_cta and "04/04" in html_cta
-        print(("✓" if ok else "✗"), "ênfase, contador e contato no card")
+        todos = "".join(h.read_text() for h in sorted((c3 / "render").glob("0*.html")))
+        ok = ("<em>reservar?</em>" in html_cta and "(11) 90000-0000" in html_cta
+              and not re.search(r">\s*0?\d\s*/\s*0?\d\s*<", todos) and "ed-progresso" not in todos)
+        print(("✓" if ok else "✗"), "ênfase e contato no card, sem contagem de peças")
         if not ok:
             falhas.append("linha editorial")
+
+        c4 = cli / "criativos" / "c4"
+        c4.mkdir(parents=True)
+        (c4 / "roteiro.json").write_text(json.dumps({"brand_kit": "../../brand-kit.json", "pecas": [
+            {"template": "ponto-ilustrado", "campos": {"numero": "01", "titulo": "x"}}]}))
+        rodar("recusa campo de contagem (numero)", [PY, render, c4 / "roteiro.json"], espera=1)
+        k2 = json.loads(kit.read_text())
+        k2["elementos"]["recorrentes"] = ["contador 01/06 no rodapé"]
+        kit_c = cli / "kit-com-contador.json"
+        kit_c.write_text(json.dumps(k2, ensure_ascii=False))
+        rodar("kit com contador em recorrentes é recusado", [PY, ext, "--validar", kit_c], espera=1)
 
         fora = base / "fora.jpg"
         shutil.copy(cli / "referencias" / "cliente" / "post00.jpg", fora)
@@ -168,7 +190,50 @@ def main():
             if not v.exists():
                 print("  (pulando o resto do vídeo: projeto não foi montado)")
                 a.com_video = False
+        # reedição de vídeo com apresentador (estilo padrão)
+        reed = SK / "criativos-video" / "scripts" / "reeditar_apresentador.py"
+        vids = cli / "referencias" / "cliente" / "videos"
+        vids.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", "testsrc2=s=720x1280:d=6:r=30",
+                        "-f", "lavfi", "-i", "sine=frequency=220:d=6", "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                        "-c:a", "aac", "-shortest", str(vids / "fala.mp4")], check=True)
+        r2 = cli / "criativos" / "reed"
+        r2.mkdir(parents=True)
+        roteiro_reed = {"brand_kit": "../../brand-kit.json", "video": "../../referencias/cliente/videos/fala.mp4",
+            "corte": [0.5, 5.5], "trilha": "pulso-leve-100bpm", "origem_zoom_y": 60,
+            "cobrir_legenda_antiga": {"topo": 1218},
+            "zooms": [{"t": 2.0, "s": 1.1, "sfx": "swipe"}],
+            "legendas": [[0.6, 1.8, "Seu *domingo*"], [1.8, 3.2, "começa aqui"], [3.2, 5.5, "com a *gente*"]],
+            "graficos": [{"tipo": "manchete", "t": 0.5, "ate": 2.4, "texto": "Gancho *escrito*", "sfx": "pop"},
+                         {"tipo": "tile", "icone": "relogio", "icone_texto": "8h", "x": 72, "y": 560, "t": 2.4, "ate": 3.6},
+                         {"tipo": "cartela", "t": 3.6, "ate": 4.8, "rotulo": "Rótulo", "texto": "Cartela *cheia*",
+                          "icones": [["loja", "A"], ["check", "B"]]},
+                         {"tipo": "logo", "t": 4.8, "ate": 5.5}],
+            "cta_duracao": 3, "cta": {"rotulo": "Contato", "titulo": "Fale no *WhatsApp.*", "botao_sub": "Resposta humana"}}
+        (r2 / "roteiro-reedicao.json").write_text(json.dumps(roteiro_reed, ensure_ascii=False))
+        rodar("monta reedição de apresentador", [PY, reed, r2 / "roteiro-reedicao.json"])
+        idx = (r2 / "video" / "index.html").read_text() if (r2 / "video" / "index.html").exists() else ""
+        ok = "(11) 90000-0000" in idx and 'data-media-start="0.500"' in idx and "tarja" in idx
+        print(("✓" if ok else "✗"), "reedição usa o WhatsApp do kit, o corte e a tarja")
+        if not ok:
+            falhas.append("reedição de apresentador")
+        (r2 / "ruim.json").write_text(json.dumps({**roteiro_reed, "legendas": [[0.6, 1.8, "cena 01/06"]]}, ensure_ascii=False))
+        rodar("reedição recusa contagem na tela", [PY, reed, r2 / "ruim.json"], espera=1)
+        (r2 / "ruim2.json").write_text(json.dumps({**roteiro_reed, "graficos": [
+            {"tipo": "tile", "icone": "logo-de-terceiro", "x": 72, "y": 560, "t": 1, "ate": 2}]}, ensure_ascii=False))
+        rodar("reedição recusa ícone fora da biblioteca", [PY, reed, r2 / "ruim2.json"], espera=1)
+        (r2 / "ruim3.json").write_text(json.dumps({**roteiro_reed, "video": str(base / "fora.mp4")}, ensure_ascii=False))
+        shutil.copy(vids / "fala.mp4", base / "fora.mp4")
+        rodar("reedição recusa vídeo fora da pasta do cliente", [PY, reed, r2 / "ruim3.json"], espera=1)
+        rodar("monta reedição de novo (roteiro bom)", [PY, reed, r2 / "roteiro-reedicao.json"])
+
         if a.com_video:
+            v2 = r2 / "video"
+            rodar("hyperframes check (reedição)", ["npx", "--yes", "hyperframes@0.8.90", "check"], cwd=v2)
+            rodar("hyperframes render (reedição)", ["npx", "--yes", "hyperframes@0.8.90", "render", "-o", "reel-mudo.mp4"], cwd=v2)
+            rodar("sonoriza a reedição (voz + trilha + efeitos)", [PY, SK / "efeitos-sonoros" / "scripts" / "mixar_sfx.py",
+                                                               v2 / "reel-mudo.mp4", v2 / "deixas.json", "--saida", v2 / "reel.mp4"])
+            rodar("reedição dentro da especificação", [PY, SK / "criativos-video" / "scripts" / "validar_reel.py", v2 / "reel.mp4"])
             rodar("hyperframes check", ["npx", "--yes", "hyperframes@0.8.90", "check"], cwd=v)
             rodar("hyperframes render", ["npx", "--yes", "hyperframes@0.8.90", "render", "-o", "reel-mudo.mp4"], cwd=v)
             rodar("sonoriza o Reel", [PY, SK / "efeitos-sonoros" / "scripts" / "mixar_sfx.py", v / "reel-mudo.mp4",
