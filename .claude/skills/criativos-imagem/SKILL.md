@@ -34,6 +34,24 @@ de cliente é trocar o kit.
 | `oferta` | produto/serviço, preço, CTA | `titulo`, `preco`?, `cta`?, `rotulo`?, `foto`? |
 | `prova-brand-kit` | prova visual do kit para o humano confirmar | — (lê do kit) |
 
+**Linha editorial** (grid com cabeçalho de logo + rótulo com fio, rodapé com fio,
+contador `01/06` e barra de progresso; ilustração do cliente num "palco"):
+
+| Template | Para quê | Campos |
+|---|---|---|
+| `capa-editorial` | capa com título de impacto e ilustração | `titulo`, `rotulo`?, `subtitulo`?, `foto`?, `layout` (`coluna`\|`topo`), `palco`? |
+| `ponto-ilustrado` | 1 ideia por peça: número vazado, título, texto/itens | `titulo`, `numero`?, `texto`?, `itens`? (até 4), `foto`?, `palco`? (`circulo`) |
+| `checklist` | resumo para salvar, até 4 itens marcados | `titulo`, `itens` (`"Item — descrição"`), `foto`? |
+| `cta-card` | card de chamada final com botão de contato | `titulo`, `texto`?, `foto`?, `cta`? (padrão "Chama no WhatsApp") |
+
+Comuns à linha editorial: `tema` (`escuro` padrão, `claro`, `primaria`, `secundaria` —
+troca só o par fundo/texto entre as cores do kit), `acento` (`secundaria` para a
+série na cor secundária) e **ênfase com asteriscos** no título/texto:
+`"Quem procura encontra *você ou o concorrente?*"` pinta o trecho na cor de acento.
+O botão do `cta-card` lê o número de `contato.whatsapp` do kit; o logo troca para
+`elementos.logo_variantes.sobre_claro` nos temas claros. Ícone de conversa genérico:
+nada de logotipo de terceiros nas artes (anúncio da Meta recusa e a regra do estúdio também).
+
 `?` = opcional. Logo, assinatura, contador de carrossel e margem de segurança do
 story entram sozinhos a partir do kit.
 

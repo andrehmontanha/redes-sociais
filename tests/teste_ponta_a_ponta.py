@@ -110,6 +110,30 @@ def main():
         if n != 6:
             falhas.append("contagem de JPEG")
 
+        # linha editorial: ênfase com asteriscos, temas, contador, card de contato
+        k = json.loads(kit.read_text())
+        k["cores"]["papeis"].update({"secundaria": "#d67841", "claro": "#fffaf2"})
+        k["contato"] = {"whatsapp": "(11) 90000-0000"}
+        kit.write_text(json.dumps(k, ensure_ascii=False, indent=2))
+        c3 = cli / "criativos" / "c3"
+        c3.mkdir(parents=True)
+        (c3 / "roteiro.json").write_text(json.dumps({"brand_kit": "../../brand-kit.json", "formato": "feed", "pecas": [
+            {"template": "capa-editorial", "campos": {"rotulo": "Guia", "titulo": "Seu domingo *começa aqui*",
+                                                      "subtitulo": "3 ideias", "foto": "../../referencias/cliente/post02.jpg"}},
+            {"template": "ponto-ilustrado", "campos": {"numero": "01", "titulo": "Café *da fazenda*", "texto": "Servido até 11h.",
+                                                       "itens": ["Pão de queijo", "Frutas"], "palco": "circulo",
+                                                       "foto": "../../referencias/cliente/post04.jpg"}},
+            {"template": "checklist", "campos": {"tema": "claro", "titulo": "Para *levar*",
+                                                 "itens": ["Toalha — a do quarto fica", "Protetor"]}},
+            {"template": "cta-card", "campos": {"acento": "secundaria", "titulo": "Quer *reservar?*", "texto": "Fale com a gente."}},
+        ]}, ensure_ascii=False))
+        rodar("renderiza linha editorial", [PY, render, c3 / "roteiro.json"])
+        html_cta = (c3 / "render" / "04-cta-card.html").read_text()
+        ok = "<em>reservar?</em>" in html_cta and "(11) 90000-0000" in html_cta and "04/04" in html_cta
+        print(("✓" if ok else "✗"), "ênfase, contador e contato no card")
+        if not ok:
+            falhas.append("linha editorial")
+
         fora = base / "fora.jpg"
         shutil.copy(cli / "referencias" / "cliente" / "post00.jpg", fora)
         c2 = cli / "criativos" / "c2"

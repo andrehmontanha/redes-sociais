@@ -1,0 +1,15 @@
+<!-- Capa editorial de carrossel: rótulo com fio, título com *ênfase*, ilustração do
+     cliente num palco, rodapé com contador e "arraste". layout: coluna (título à
+     direita de um fio vertical, ilustração à esquerda) ou topo (título largo no alto). -->
+<div class="quadro ed tema-{{tema}} {{#acento}}acento-{{acento}}{{/acento}} ed-capa-{{#layout}}{{layout}}{{/layout}}{{^layout}}coluna{{/layout}}">
+  {{#logo}}<img class="ed-logo" src="{{logo}}" alt="">{{/logo}}{{^logo}}<div class="ed-logo" style="font-family:var(--fonte-titulo);font-weight:var(--peso-titulo);font-size:34px;height:auto">{{assinatura}}</div>{{/logo}}
+  {{#rotulo}}<div class="ed-rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
+  <div class="ed-fio-v"></div>
+  <h1 class="ed-titulo ajustar" data-campo="titulo" data-min="56">{{{titulo_html}}}</h1>
+  {{#subtitulo}}<p class="ed-texto ed-sub ajustar" data-campo="subtitulo" data-min="26">{{{subtitulo_html}}}</p>{{/subtitulo}}
+  {{#foto}}<div class="ed-palco {{#palco}}{{palco}}{{/palco}}{{^palco}}sem-painel{{/palco}}"><img src="{{foto}}" alt=""></div>{{/foto}}
+  <div class="ed-rodape">
+    <span class="ed-contador">{{#carrossel}}{{indice_fmt}}/{{total_fmt}}{{/carrossel}}{{^carrossel}}{{assinatura}}{{/carrossel}}</span>
+    <span class="ed-arraste">{{#arraste}}{{arraste}}{{/arraste}}{{^arraste}}Arraste →{{/arraste}}</span>
+  </div>
+</div>

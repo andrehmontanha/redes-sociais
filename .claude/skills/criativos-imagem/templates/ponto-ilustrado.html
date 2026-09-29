@@ -1,0 +1,17 @@
+<!-- Peça de conteúdo: número vazado, título com *ênfase*, ilustração do cliente num
+     palco à direita e, abaixo de um fio, texto e/ou até 4 itens. -->
+<div class="quadro ed tema-{{tema}} {{#acento}}acento-{{acento}}{{/acento}} ed-ponto">
+  {{#logo}}<img class="ed-logo" src="{{logo}}" alt="">{{/logo}}{{^logo}}<div class="ed-logo" style="font-family:var(--fonte-titulo);font-weight:var(--peso-titulo);font-size:34px;height:auto">{{assinatura}}</div>{{/logo}}
+  {{#rotulo}}<div class="ed-rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
+  {{#numero}}<div class="ed-numero">{{numero}}</div>{{/numero}}
+  <h2 class="ed-titulo ajustar" data-campo="titulo" data-min="48" {{^numero}}style="top:250px;max-height:520px"{{/numero}}>{{{titulo_html}}}</h2>
+  {{#foto}}<div class="ed-palco {{#palco}}{{palco}}{{/palco}}"><img src="{{foto}}" alt=""></div>{{/foto}}
+  <div class="ed-baixo">
+    {{#texto}}<p class="ed-texto ajustar" data-campo="texto" data-min="26" style="max-height:200px">{{{texto_html}}}</p>{{/texto}}
+    {{#tem_itens}}<ul class="ed-itens ajustar" data-campo="itens" data-min="24" style="max-height:220px">{{#itens}}<li>{{.}}</li>{{/itens}}</ul>{{/tem_itens}}
+  </div>
+  <div class="ed-rodape">
+    <span class="ed-contador">{{#carrossel}}{{indice_fmt}}/{{total_fmt}}{{/carrossel}}{{^carrossel}}{{assinatura}}{{/carrossel}}</span>
+    {{#carrossel}}<span class="ed-progresso">{{#passos}}<i class="{{classe}}"></i>{{/passos}}</span>{{/carrossel}}
+  </div>
+</div>
