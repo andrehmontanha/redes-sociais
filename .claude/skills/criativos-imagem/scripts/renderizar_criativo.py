@@ -129,6 +129,7 @@ def css_marca(kit, largura, altura, base_kit: Path):
       --fundo: {cores['fundo']}; --primaria: {cores['primaria']};
       --destaque: {cores['destaque']}; --texto: {cores['texto']};
       --texto-sobre-foto: {cores.get('texto_sobre_foto', '#ffffff')};
+      --texto-sobre-destaque: {cores.get('texto_sobre_destaque', cores['fundo'])};
       --fonte-titulo: '{tip['titulo']['familia']}', serif; --peso-titulo: {tip['titulo'].get('peso', 700)};
       --caixa-titulo: {caixa};
       --fonte-texto: '{tip['texto']['familia']}', sans-serif; --peso-texto: {tip['texto'].get('peso', 400)};

@@ -237,6 +237,15 @@ def validar(arq: Path) -> int:
             erros.append(f"contraste texto/fundo {c:.2f} abaixo de 4.5 (WCAG AA) — legenda some no celular")
     except (KeyError, ValueError):
         erros.append("cores.papeis precisa de 'texto' e 'fundo' em hex")
+    if "destaque" in papeis:
+        sobre = papeis.get("texto_sobre_destaque", papeis.get("fundo"))
+        try:
+            c = contraste(rgb_de(sobre), rgb_de(papeis["destaque"]))
+            if c < 3:
+                erros.append(f"contraste do botão (texto {sobre} sobre destaque {papeis['destaque']}) {c:.2f} "
+                             "abaixo de 3 — defina cores.papeis.texto_sobre_destaque")
+        except (KeyError, ValueError):
+            pass
     if not kit.get("confirmado_por"):
         erros.append("confirmado_por vazio — o brand kit só vale depois que um humano confirma")
     if len(kit.get("referencias_aprovadas", [])) < 3:

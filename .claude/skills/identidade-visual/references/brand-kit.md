@@ -15,6 +15,7 @@ Cada bloco tem `origem`: `medido` (script), `observado` (você olhou e cita o po
 | `paleta` | medição bruta | não edite; é o registro do que o script viu |
 
 Opcional: `papeis.texto_sobre_foto` quando a marca usa uma cor específica sobre fotografia.
+`papeis.texto_sobre_destaque`: cor do texto dentro do botão/CTA (padrão: `fundo`). A validação exige contraste ≥ 3 com `destaque` — laranja com texto branco, comum em sites, costuma reprovar.
 
 ## tratamento_foto
 

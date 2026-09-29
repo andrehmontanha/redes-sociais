@@ -72,7 +72,7 @@ def main():
                                                "--saida", kit], espera=1)
         k = json.loads(kit.read_text())
         k["cores"]["papeis"] = {"fundo": "#f6efe4", "primaria": "#1c3d34", "destaque": "#d67841",
-                                "texto": "#1c3d34", "texto_sobre_foto": "#ffffff"}
+                                "texto": "#1c3d34", "texto_sobre_foto": "#ffffff", "texto_sobre_destaque": "#f6efe4"}
         k["tipografia"] = {"origem": "observado",
                            "titulo": {"familia": "Playfair Display", "peso": 700, "caixa": "normal", "google_fonts": True},
                            "texto": {"familia": "Inter", "peso": 400, "google_fonts": True}}
@@ -85,6 +85,9 @@ def main():
                       "estilo_movimento": "sobrio", "sfx_familia": "sutil"}
         k["confirmado_por"] = "teste automatizado"
         k["referencias_aprovadas"] = ["post00.jpg", "post01.jpg", "post02.jpg"]
+        kit.write_text(json.dumps(k, ensure_ascii=False, indent=2))
+        rodar("recusa botão com contraste baixo", [PY, ext, "--validar", kit], espera=1)
+        k["cores"]["papeis"]["texto_sobre_destaque"] = "#1c3d34"
         kit.write_text(json.dumps(k, ensure_ascii=False, indent=2))
         rodar("kit completo é aceito", [PY, ext, "--validar", kit])
 
@@ -138,6 +141,10 @@ def main():
                           {"tipo": "cta", "titulo": "Reserve pelo link da bio", "duracao": 2.5}]}, ensure_ascii=False))
             rodar("monta projeto HyperFrames", [PY, SK / "criativos-video" / "scripts" / "montar_reel.py", r1 / "roteiro-video.json"])
             v = r1 / "video"
+            if not v.exists():
+                print("  (pulando o resto do vídeo: projeto não foi montado)")
+                a.com_video = False
+        if a.com_video:
             rodar("hyperframes check", ["npx", "--yes", "hyperframes@0.8.90", "check"], cwd=v)
             rodar("hyperframes render", ["npx", "--yes", "hyperframes@0.8.90", "render", "-o", "reel-mudo.mp4"], cwd=v)
             rodar("sonoriza o Reel", [PY, SK / "efeitos-sonoros" / "scripts" / "mixar_sfx.py", v / "reel-mudo.mp4",

@@ -24,7 +24,7 @@ O que ele faz:
     - normaliza o resultado para -14 LUFS integrado, pico real -1 dBTP
       (o alvo de loudness das plataformas sociais; acima disso o app reduz, abaixo
       o vídeo soa fraco perto dos outros no feed)
-    - copia o vídeo sem recomprimir; áudio AAC 128 kbps 48 kHz estéreo (teto da API para Reels)
+    - copia o vídeo sem recomprimir; áudio AAC 112 kbps 48 kHz estéreo (o encoder passa do alvo em trechos densos; o teto da API é 128)
     - grava <saida>.creditos.txt quando algum som exige crédito na legenda
 """
 
@@ -118,7 +118,7 @@ def main():
     filtros.append(f"{''.join(rotulos)}amix=inputs={len(rotulos)}:normalize=0:dropout_transition=0,"
                    f"atrim=0:{dur:.3f},loudnorm=I={a.lufs}:TP=-1.0:LRA=11,aresample=48000[mix]")
     cmd = ["ffmpeg", "-y", "-loglevel", "error", *entradas, "-filter_complex", ";".join(filtros),
-           "-map", "0:v", "-map", "[mix]", "-c:v", "copy", "-c:a", "aac", "-b:a", "128k", "-ar", "48000",
+           "-map", "0:v", "-map", "[mix]", "-c:v", "copy", "-c:a", "aac", "-b:a", "112k", "-ar", "48000",
            "-movflags", "+faststart", "-shortest", str(a.saida)]
     subprocess.run(cmd, check=True)
 

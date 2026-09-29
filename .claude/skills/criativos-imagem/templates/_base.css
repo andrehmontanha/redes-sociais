@@ -33,7 +33,7 @@ body { width: var(--largura); height: var(--altura); overflow: hidden; }
   color: var(--primaria); font-weight: 600;
 }
 .cta {
-  align-self: flex-start; background: var(--destaque); color: var(--fundo);
+  align-self: flex-start; background: var(--destaque); color: var(--texto-sobre-destaque);
   font-weight: 700; font-size: 34px; padding: 22px 40px; border-radius: var(--raio);
 }
 .centro .cta { align-self: center; }

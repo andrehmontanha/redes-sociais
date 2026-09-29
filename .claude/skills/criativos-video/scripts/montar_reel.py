@@ -214,11 +214,15 @@ def montar(roteiro_path: Path):
             tweens.append(f'tl.fromTo("#{cid}", {{opacity: 0}}, {{opacity: 1, duration: {trans}}}, {t});')
             tweens.append(f'tl.to("#cena{n - 1:02d}-area", {{opacity: 0, duration: {trans * 0.6:.3f}}}, {t});')
         if texto and mostra_texto:
-            if energico:
-                tweens.append(f'tl.fromTo(".{cid}-p", {{opacity: {0.35 if n == 1 else 0}, scale: 0.6, y: 30}}, {{opacity: 1, scale: 1, y: 0, '
+            if n == 1:
+                # gancho: 100% legível no quadro 0; só um "punch" de escala, sem fade
+                tweens.append(f'tl.fromTo("#{cid}-titulo", {{scale: {1.1 if energico else 1.04}}}, {{scale: 1, '
+                              f'duration: 0.45, ease: "power2.out", transformOrigin: "left bottom"}}, {t});')
+            elif energico:
+                tweens.append(f'tl.fromTo(".{cid}-p", {{opacity: 0, scale: 0.6, y: 30}}, {{opacity: 1, scale: 1, y: 0, '
                               f'duration: 0.35, ease: "back.out(2)", stagger: 0.07}}, {t + atraso});')
             else:
-                tweens.append(f'tl.fromTo("#{cid}-titulo", {{opacity: {0.35 if n == 1 else 0}, y: 40}}, {{opacity: 1, y: 0, '
+                tweens.append(f'tl.fromTo("#{cid}-titulo", {{opacity: 0, y: 40}}, {{opacity: 1, y: 0, '
                               f'duration: 0.6, ease: "power3.out"}}, {t + atraso});')
         if c.get("rotulo") and mostra_texto:
             tweens.append(f'tl.fromTo("#{cid}-rotulo", {{opacity: 0, y: 20}}, {{opacity: 1, y: 0, duration: 0.4}}, {t + 0.1});')
