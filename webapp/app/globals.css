@@ -50,7 +50,7 @@ h1 { font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -0.02em; }
 h2 { font-size: 1.15rem; letter-spacing: -0.01em; }
 h3 { font-size: 1rem; }
 p { margin: 0; }
-code { font: 0.9em ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--seq-vazio); padding: 1px 6px; border-radius: 6px; word-break: break-all; }
+code { font: 0.9em ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--seq-vazio); padding: 1px 6px; border-radius: 6px; overflow-wrap: anywhere; }
 
 .topo {
   position: sticky; top: 0; z-index: 10;
