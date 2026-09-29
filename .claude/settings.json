@@ -4,7 +4,13 @@
       "Bash(python .claude/skills/publicar-instagram/scripts/fila.py aprovar:*)",
       "Bash(python3 .claude/skills/publicar-instagram/scripts/fila.py aprovar:*)",
       "Bash(python .claude/skills/publicar-instagram/scripts/publicar.py item:*)",
-      "Bash(python3 .claude/skills/publicar-instagram/scripts/publicar.py item:*)"
+      "Bash(python3 .claude/skills/publicar-instagram/scripts/publicar.py item:*)",
+      "Bash(python .claude/skills/avatares/scripts/avatar.py registrar:*)",
+      "Bash(python .claude/skills/avatares/scripts/avatar.py criar:*)",
+      "Bash(python .claude/skills/avatares/scripts/avatar.py gerar:*)",
+      "Bash(python3 .claude/skills/avatares/scripts/avatar.py registrar:*)",
+      "Bash(python3 .claude/skills/avatares/scripts/avatar.py criar:*)",
+      "Bash(python3 .claude/skills/avatares/scripts/avatar.py gerar:*)"
     ],
     "deny": [
       "Read(./.env)"

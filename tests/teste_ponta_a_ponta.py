@@ -169,6 +169,104 @@ def main():
         rodar("recusa item alterado depois da aprovação", [PY, pub, "--simular", "item", item, "--agora"], espera=1, env=env)
         rodar("recusa legenda com 31 hashtags", [PY, fila, "criar", "--cliente", "demo", "--tipo", "feed", "--midias",
                                                  jpgs[0], "--legenda", " ".join(f"#t{i}" for i in range(31))], espera=1, env=env)
+
+        # conexão com o Instagram (sem rede: link, state e sincronização offline)
+        con = SK / "conectar-instagram" / "scripts"
+        env_app = {**env, "IG_APP_ID": "123", "IG_APP_SECRET": "segredo", "IG_REDIRECT_URI": "https://exemplo.com/retorno"}
+        saida = rodar("gera link de autorização", [PY, con / "conectar.py", "url", "--cliente", "demo"], env=env_app)
+        print(("✓" if "instagram.com/oauth/authorize" in saida and "state=" in saida else "✗"), "link com state")
+        rodar("recusa retorno com state forjado", [PY, con / "conectar.py", "trocar", "--cliente", "demo", "--retorno",
+                                                    "https://exemplo.com/retorno?code=abc&state=forjado"], espera=1, env=env_app)
+        rodar("recusa redirect sem HTTPS", [PY, con / "conectar.py", "url", "--cliente", "demo"], espera=1,
+              env={**env_app, "IG_REDIRECT_URI": "http://exemplo.com/r"})
+        bruto = base / "bruto.json"
+        bruto.write_text(json.dumps({
+            "perfil": {"username": "demo", "followers_count": 12000, "follows_count": 200, "media_count": 300},
+            "midias": [{"id": str(i), "caption": f"post {i} #demo", "media_type": "IMAGE" if i % 2 else "VIDEO",
+                        "media_product_type": "FEED" if i % 2 else "REELS", "permalink": f"https://instagram.com/p/X{i}",
+                        "shortcode": f"X{i}", "timestamp": f"2026-09-{10 + i:02d}T21:00:00+0000",
+                        "like_count": 100 + i, "comments_count": 5} for i in range(12)],
+            "insights": {str(i): {"reach": 1000 * (i + 1), "saved": 10 + i, "shares": 5 + i, "views": 3000,
+                                  "likes": 100 + i, "comments": 5} for i in range(12)},
+            "conta_insights": {"reach": 50000}}))
+        rodar("sincroniza (offline)", [PY, con / "sincronizar.py", "--cliente", "demo", "--de-arquivo", bruto,
+                                       "--nicho", "turismo_hotelaria"], env=env)
+        dados = next((base / "clientes" / "demo" / "instagram").glob("*/dados_demo.json"))
+        rodar("análise aceita os dados sincronizados", [PY, SK / "analise-perfil-instagram" / "scripts" /
+                                                         "calcular_metricas.py", dados])
+        rodar("recusa dados de outra conta", [PY, con / "sincronizar.py", "--cliente", "outro", "--de-arquivo", bruto],
+              espera=1, env=env)
+
+        # avatares com consentimento (API simulada)
+        av = SK / "avatares" / "scripts" / "avatar.py"
+        termo = base / "termo.pdf"
+        termo.write_bytes(b"%PDF-1.4 termo assinado " + b"x" * 2000)
+        reg = ["registrar", "--cliente", "demo", "--nome", "Ana Souza", "--contato", "ana@exemplo.com",
+               "--termo", termo, "--assinado-em", "2026-09-01", "--validade", "2027-08-31",
+               "--usos", "institucional,oferta", "--voz", "sim"]
+        rodar("recusa avatar sem declaração de maioridade", [PY, av, *reg], espera=1, env=env)
+        rodar("recusa validade acima de 24 meses", [PY, av, *reg[:-6], "--validade", "2029-01-01", "--usos",
+                                                     "oferta", "--voz", "sim", "--maior-de-idade"], espera=1, env=env)
+        rodar("registra termo de consentimento", [PY, av, *reg, "--maior-de-idade"], env=env)
+        gravacao = base / "clientes" / "demo" / "avatares" / "ana-souza" / "gravacao" / "treino.mp4"
+        gravacao.parent.mkdir(parents=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", "testsrc2=s=1080x1920:r=30:d=20",
+                        "-f", "lavfi", "-i", "sine=f=200:d=20", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac",
+                        "-shortest", str(gravacao)], check=True)
+        rodar("recusa gerar antes do consentimento", [PY, av, "--simular", "gerar", "--cliente", "demo", "--pessoa",
+                                                       "ana-souza", "--uso", "oferta", "--roteiro", termo, "--nome", "x"],
+              espera=1, env=env)
+        rodar("envia treino (simulado)", [PY, av, "--simular", "criar", "--cliente", "demo", "--pessoa", "ana-souza",
+                                          "--video", gravacao], env=env)
+        rodar("gera link de consentimento (simulado)", [PY, av, "--simular", "consentimento", "--cliente", "demo",
+                                                         "--pessoa", "ana-souza"], env=env)
+        rodar("ativa após treino e consentimento", [PY, av, "--simular", "status", "--cliente", "demo"], env=env)
+        fala = base / "fala.txt"
+        fala.write_text("Vote no nosso candidato e venha para o resort!")
+        rodar("recusa roteiro com tema vedado", [PY, av, "--simular", "gerar", "--cliente", "demo", "--pessoa",
+                                                  "ana-souza", "--uso", "oferta", "--roteiro", fala, "--nome", "x"],
+              espera=1, env=env)
+        fala.write_text("Oi! Os pacotes de outubro já estão abertos. Reserve pelo link da bio.")
+        rodar("recusa uso fora do termo", [PY, av, "--simular", "gerar", "--cliente", "demo", "--pessoa", "ana-souza",
+                                            "--uso", "evento", "--roteiro", fala, "--nome", "x"], espera=1, env=env)
+        rodar("gera vídeo do avatar (simulado, WebM com alfa)", [PY, av, "--simular", "gerar", "--cliente", "demo",
+                                                                  "--pessoa", "ana-souza", "--uso", "oferta", "--roteiro",
+                                                                  fala, "--nome", "oferta-outubro", "--transparente"], env=env)
+        webm = next((base / "clientes" / "demo" / "avatares" / "ana-souza" / "videos").glob("*.webm"))
+        r2 = cli / "criativos" / "r2"
+        r2.mkdir()
+        (r2 / "roteiro-video.json").write_text(json.dumps({"brand_kit": "../../brand-kit.json", "trilha": "ambiente-calmo",
+            "cenas": [{"tipo": "avatar", "midia": f"../../avatares/ana-souza/videos/{webm.name}",
+                       "fundo": "../../referencias/cliente/post01.jpg", "texto": "Pacotes de outubro"},
+                      {"tipo": "cta", "titulo": "Reserve pelo link da bio", "duracao": 2.5}]}, ensure_ascii=False))
+        montar = SK / "criativos-video" / "scripts" / "montar_reel.py"
+        rodar("monta Reel com avatar", [PY, montar, r2 / "roteiro-video.json"], env=env)
+        if a.com_video and (r2 / "video").exists():
+            v2 = r2 / "video"
+            rodar("hyperframes check (avatar)", ["npx", "--yes", "hyperframes@0.8.90", "check"], cwd=v2)
+            rodar("hyperframes render (avatar)", ["npx", "--yes", "hyperframes@0.8.90", "render", "-o", "reel-mudo.mp4"], cwd=v2)
+            rodar("sonoriza Reel com voz do avatar", [PY, SK / "efeitos-sonoros" / "scripts" / "mixar_sfx.py",
+                                                      v2 / "reel-mudo.mp4", v2 / "deixas.json", "--saida", v2 / "reel.mp4"])
+            item = rodar("fila detecta avatar e põe aviso de IA", [PY, fila, "criar", "--cliente", "demo", "--tipo", "reel",
+                                                                    "--midias", v2 / "reel.mp4", "--legenda", "Outubro!"], env=env)
+            post = json.loads((Path(item) / "post.json").read_text())
+            ok = post["avatares"] == ["ana-souza"] and "criado com IA" in post["legenda"]
+            print(("✓" if ok else "✗"), "post marcado com avatar e aviso na legenda")
+            if not ok:
+                falhas.append("aviso de IA")
+            rodar("prévia do post com avatar", [PY, fila, "previa", item], env=env)
+            rodar("recusa aprovar sem a pessoa retratada", [PY, fila, "aprovar", item, "--por", "Gestor"], espera=1, env=env)
+            rodar("aprova com a pessoa retratada", [PY, fila, "aprovar", item, "--por", "Gestor", "--pessoas", "Ana Souza"],
+                  env=env)
+            rodar("revoga consentimento", [PY, av, "--simular", "revogar", "--cliente", "demo", "--pessoa", "ana-souza",
+                                           "--motivo", "pedido da pessoa"], env=env)
+            rodar("publicação bloqueada após revogação", [PY, pub, "--simular", "item", item, "--agora"], espera=1, env=env)
+            post = json.loads((Path(item) / "post.json").read_text())
+            print(("✓" if post["status"] == "cancelado" else "✗"), "item da fila cancelado pela revogação")
+            if post["status"] != "cancelado":
+                falhas.append("cancelamento por revogação")
+        rodar("recusa montar Reel com avatar revogado" if a.com_video else "monta de novo (ainda ativo)",
+              [PY, montar, r2 / "roteiro-video.json"], espera=1 if a.com_video else 0, env=env)
     finally:
         if a.manter:
             print("pasta do teste:", base)

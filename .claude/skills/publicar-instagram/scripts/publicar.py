@@ -60,12 +60,13 @@ class Graph:
         k = chave(handle)
         self.user_id = os.environ.get(f"IG_{k}_USER_ID")
         self.token = os.environ.get(f"IG_{k}_TOKEN")
-        host = os.environ.get("IG_GRAPH_HOST", "graph.facebook.com")
+        # conta conectada pelo conectar-instagram grava o próprio host (login do Instagram)
+        host = os.environ.get(f"IG_{k}_GRAPH_HOST") or os.environ.get("IG_GRAPH_HOST", "graph.facebook.com")
         versao = os.environ.get("IG_GRAPH_VERSION", "v23.0")
         self.base = f"https://{host}/{versao}"
         if not simular and not (self.user_id and self.token):
-            sys.exit(f"credenciais ausentes: defina IG_{k}_USER_ID e IG_{k}_TOKEN no .env "
-                     "(veja references/configuracao-meta.md)")
+            sys.exit(f"@{handle} não conectado: rode `conectar-instagram/scripts/conectar.py url --cliente {handle}` "
+                     "ou defina IG_{k}_USER_ID e IG_{k}_TOKEN no .env (references/configuracao-meta.md)")
         self.user_id = self.user_id or "<IG_USER_ID>"
 
     def chamar(self, metodo, caminho, **params):
@@ -155,6 +156,12 @@ def publicar_item(item: Path, agora_mesmo=False, simular=False):
     if fila.impressao(item, post) != post["aprovacao"]["impressao"]:
         print(f"✗ {item.name}: mídia, legenda ou horário mudaram depois da aprovação — precisa de nova aprovação")
         return False
+    if post.get("avatares"):  # consentimento pode ter sido revogado depois da aprovação
+        av = fila.verificador_avatares()
+        impedimentos = [e for p in post["avatares"] for e in av.verificar_uso(post["cliente"], p)]
+        if impedimentos:
+            print(f"✗ {item.name}: " + "; ".join(impedimentos))
+            return False
     if post["agendado_para"] and not agora_mesmo:
         quando = datetime.fromisoformat(post["agendado_para"])
         if quando > datetime.now(timezone.utc):

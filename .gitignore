@@ -13,3 +13,4 @@ clientes/*
 __pycache__/
 *.pyc
 .DS_Store
+**/video/assets.montando/

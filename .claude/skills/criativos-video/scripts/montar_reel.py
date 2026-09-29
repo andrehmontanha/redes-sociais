@@ -17,6 +17,8 @@ roteiro-video.json:
         {"tipo": "video", "midia": "../../material-cliente/b.mp4", "inicio_s": 3, "duracao": 3, "texto": "...",
          "som_original": true},                  # leva a voz/som do vídeo para o Reel
         {"tipo": "texto", "rotulo": "você sabia?", "titulo": "38 °C direto da fonte", "duracao": 2.5},
+        {"tipo": "avatar", "midia": "../../avatares/<pessoa>/videos/<arquivo>.webm", "fundo": "../../referencias/cliente/c.jpg",
+         "texto": "opcional", "enquadramento": "base"},   # duração = a da fala; exige manifesto e consentimento
         {"tipo": "cta",   "titulo": "Reserve pelo link da bio", "duracao": 3}
       ]
     }
@@ -118,6 +120,27 @@ def copiar_midia(valor, base: Path, raiz_cliente: Path, pasta_assets: Path, n: i
     return f"assets/{destino.name}"
 
 
+def sondar_duracao(arq: Path):
+    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(arq)],
+                       capture_output=True, text=True, check=True)
+    return r.stdout.strip()
+
+
+def conferir_avatar(midia: Path, raiz_cliente: Path) -> str:
+    """Vídeo de avatar só entra com o manifesto gerado pelo avatar.py e consentimento válido agora."""
+    manifesto = midia.with_suffix(".json")
+    if not manifesto.exists():
+        sys.exit(f"{midia.name} sem manifesto de avatar — só vídeos gerados por avatar.py gerar entram como avatar")
+    pessoa = json.loads(manifesto.read_text(encoding="utf-8"))["pessoa"]
+    sys.path.insert(0, str(SKILLS / "avatares" / "scripts"))
+    import avatar
+    avatar.RAIZ = raiz_cliente.parent.parent
+    impedimentos = avatar.verificar_uso(raiz_cliente.name, pessoa)
+    if impedimentos:
+        sys.exit("avatar sem liberação:\n  " + "\n  ".join(impedimentos))
+    return pessoa
+
+
 def palavras(texto, classe):
     return " ".join(f'<span class="{classe}">{html.escape(w)}</span>' for w in texto.split())
 
@@ -140,9 +163,10 @@ def montar(roteiro_path: Path):
         sys.exit("roteiro sem cenas")
 
     projeto = base / "video"
-    if projeto.exists():
-        shutil.rmtree(projeto / "assets", ignore_errors=True)
-    assets = projeto / "assets"
+    # monta numa pasta temporária: se alguma trava recusar no meio do caminho,
+    # o projeto anterior continua intacto
+    assets = projeto / "assets.montando"
+    shutil.rmtree(assets, ignore_errors=True)
     assets.mkdir(parents=True, exist_ok=True)
     shutil.copy2(gsap_local(), assets / "gsap.min.js")
     css_fontes = fontes_locais(kit, assets / "fontes", raiz_cliente)
@@ -154,12 +178,16 @@ def montar(roteiro_path: Path):
 
     blocos, tweens, cortes, textos = [], [], [], []
     som_original = False
+    avatares = []
     t = 0.0
     trans = 0.0 if energico else 0.35
     for n, c in enumerate(cenas, 1):
+        if c["tipo"] == "avatar" and "duracao" not in c:
+            c["duracao"] = round(float(sondar_duracao((base / c["midia"]).resolve())) - float(c.get("inicio_s", 0)), 2)
         dur = float(c["duracao"])
-        if not 0.5 <= dur <= 15:
-            sys.exit(f"cena {n}: duração {dur}s fora de 0,5–15 s")
+        limite = 60 if c["tipo"] == "avatar" else 15
+        if not 0.5 <= dur <= limite:
+            sys.exit(f"cena {n}: duração {dur}s fora de 0,5–{limite} s")
         cid = f"cena{n:02d}"
         mostra_texto = c["tipo"] in ("texto", "cta") or legenda == "sempre" or (legenda == "gancho" and n == 1)
         texto = c.get("texto") or c.get("titulo") or ""
@@ -180,8 +208,26 @@ def montar(roteiro_path: Path):
                 som_original = True
                 blocos.append(f'<audio id="{cid}-audio" src="{src}" data-start="{t:.3f}" data-duration="{dur + trans:.3f}" '
                               f'data-media-start="{inicio:.3f}" data-track-index="10" data-volume="1"></audio>')
+        elif c["tipo"] == "avatar":
+            pessoa = conferir_avatar((base / c["midia"]).resolve(), raiz_cliente)
+            avatares.append(pessoa)
+            src = copiar_midia(c["midia"], base, raiz_cliente, assets, n)
+            inicio = float(c.get("inicio_s", 0))
+            if c.get("fundo"):
+                fsrc = copiar_midia(c["fundo"], base, raiz_cliente, assets, n + 100)
+                fundo_html = f'<div class="midia" id="{cid}-midia" data-layout-allow-overflow><img src="{fsrc}" alt=""></div>'
+                tweens.append(f'tl.fromTo("#{cid}-midia", {{scale: 1}}, {{scale: 1.04, duration: {dur + trans}, ease: "none"}}, {t});')
+            else:
+                fundo_html = '<div class="midia fundo-marca"></div>'
+            enquadramento = "avatar-base" if c.get("enquadramento") == "base" else "avatar-cheio"
+            som_original = True
+            avatar_html = (f'<div class="midia-avatar {enquadramento}"><video id="{cid}-avatar" src="{src}" '
+                           f'data-start="{t:.3f}" data-duration="{dur + trans:.3f}" data-media-start="{inicio:.3f}" '
+                           f'data-track-index="2" muted playsinline></video></div>'
+                           f'<audio id="{cid}-voz" src="{src}" data-start="{t:.3f}" data-duration="{dur:.3f}" '
+                           f'data-media-start="{inicio:.3f}" data-track-index="11" data-volume="1"></audio>')
         elif c["tipo"] not in ("texto", "cta"):
-            sys.exit(f"cena {n}: tipo '{c['tipo']}' inválido (foto, video, texto, cta)")
+            sys.exit(f"cena {n}: tipo '{c['tipo']}' inválido (foto, video, avatar, texto, cta)")
 
         fundo_solido = c["tipo"] in ("texto", "cta")
         conteudo = ""
@@ -202,11 +248,20 @@ def montar(roteiro_path: Path):
                 conteudo += f'<div class="assinatura" id="{cid}-assinatura">{html.escape(kit["elementos"]["assinatura"])}</div>'
 
         classe_secao = "cena solido" if fundo_solido else ("cena sobre-midia" if c["tipo"] != "video" else "cena sobre-video")
-        blocos.append(
-            f'<section id="{cid}" class="clip {classe_secao}" data-start="{t:.3f}" data-duration="{dur + trans:.3f}" '
-            f'data-track-index="{1 if c["tipo"] == "video" else 0}">{fundo_html}'
-            f'{"<div class=veu></div>" if fundo_html or c["tipo"] == "video" else ""}'
-            f'<div class="texto-area" id="{cid}-area">{conteudo}</div></section>')
+        if c["tipo"] == "avatar":
+            # camadas: fundo → avatar (WebM com alfa) → texto. Texto nunca atrás da pessoa.
+            blocos.append(f'<section id="{cid}" class="clip cena" data-start="{t:.3f}" data-duration="{dur + trans:.3f}" '
+                          f'data-track-index="0">{fundo_html}</section>')
+            blocos.append(avatar_html)
+            blocos.append(f'<section id="{cid}-textos" class="clip cena cena-avatar" data-start="{t:.3f}" '
+                          f'data-duration="{dur + trans:.3f}" data-track-index="3">'
+                          f'<div class="texto-area" id="{cid}-area">{conteudo}</div></section>')
+        else:
+            blocos.append(
+                f'<section id="{cid}" class="clip {classe_secao}" data-start="{t:.3f}" data-duration="{dur + trans:.3f}" '
+                f'data-track-index="{1 if c["tipo"] == "video" else 0}">{fundo_html}'
+                f'{"<div class=veu></div>" if fundo_html or c["tipo"] == "video" else ""}'
+                f'<div class="texto-area" id="{cid}-area">{conteudo}</div></section>')
 
         if trans and n > 1:
             # crossfade: a cena nova entra inteira e o texto da anterior sai junto,
@@ -236,6 +291,10 @@ def montar(roteiro_path: Path):
     duracao = round(t + trans, 3)
     if duracao < 3:
         sys.exit(f"Reel com {duracao}s — mínimo de 3 s na API")
+    if avatares:
+        # aviso de IA fixo durante o vídeo inteiro, dentro da área segura
+        blocos.append(f'<div id="selo-ia" class="clip selo-ia" data-start="0" data-duration="{duracao}" '
+                      f'data-track-index="9">Avatar digital criado com IA · uso autorizado</div>')
 
     tip = kit["tipografia"]
     caixa = {"maiusculas": "uppercase", "minusculas": "lowercase"}.get(tip["titulo"].get("caixa"), "none")
@@ -274,6 +333,18 @@ def montar(roteiro_path: Path):
       .sobre-midia .rotulo, .sobre-video .rotulo {{ color: inherit; }}
       .subtitulo {{ font-size: 44px; line-height: 1.3; }}
       .logo-cta {{ height: 120px; width: auto; }}
+      .fundo-marca {{ background: {cores['primaria']}; }}
+      .midia-avatar {{ position: absolute; inset: 0; }}
+      .midia-avatar video {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
+      .avatar-base {{ top: 30%; }}
+      .avatar-base video {{ object-fit: contain; object-position: center bottom; }}
+      /* texto sobre avatar vai em caixa com o par fundo/texto do kit: contraste garantido
+         sem escurecer a pessoa */
+      .cena-avatar .titulo, .cena-avatar .rotulo {{ background: {cores['fundo']}; color: {cores['texto']};
+        padding: 14px 24px; border-radius: 18px; }}
+      .cena-avatar .titulo {{ font-size: 80px; }}
+      .selo-ia {{ position: absolute; top: 150px; left: {s['esquerda']}px; padding: 10px 18px; border-radius: 999px;
+        background: rgba(0,0,0,.55); color: #fff; font-size: 26px; font-weight: 600; letter-spacing: .01em; }}
       .assinatura {{ font-size: 40px; font-weight: 600; color: {cores['primaria']}; }}
     </style>
   </head>
@@ -290,6 +361,8 @@ def montar(roteiro_path: Path):
   </body>
 </html>
 """
+    shutil.rmtree(projeto / "assets", ignore_errors=True)
+    assets.rename(projeto / "assets")
     (projeto / "index.html").write_text(doc, encoding="utf-8")
     (projeto / "package.json").write_text(json.dumps({
         "name": re.sub(r"[^a-z0-9-]", "-", base.name.lower()), "private": True, "type": "module",
@@ -303,6 +376,11 @@ def montar(roteiro_path: Path):
 
     deixas = propor_deixas(video_kit.get("sfx_familia", "sutil"), roteiro.get("trilha"), textos, cortes, cenas, duracao)
     deixas["manter_audio_original"] = som_original
+    arq_av = projeto / "avatares.json"
+    if avatares:
+        arq_av.write_text(json.dumps({"avatares": sorted(set(avatares))}, ensure_ascii=False), encoding="utf-8")
+    elif arq_av.exists():
+        arq_av.unlink()
     arq_deixas = projeto / "deixas.json"
     arq_deixas.write_text(json.dumps(deixas, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"projeto: {projeto}")

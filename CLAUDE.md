@@ -9,11 +9,13 @@ que conduz o ciclo e chama as skills na ordem.
 
 | Skill | Papel |
 |---|---|
+| `conectar-instagram` | OAuth da conta do cliente; sincroniza posts, mídia original e métricas internas |
 | `analise-perfil-instagram` | diagnóstico, benchmark, tendências, teardown, captura do material do cliente |
 | `identidade-visual` | brand kit medido + observado + confirmado (`clientes/<h>/brand-kit.json`) |
 | `criativos-imagem` | post, carrossel e story em JPEG a partir de templates HTML + brand kit |
 | `criativos-video` | Reels com HyperFrames (motion) a partir de roteiro de cenas |
 | `efeitos-sonoros` | biblioteca de SFX/trilhas livres de direitos, catálogo com licença, mixagem −14 LUFS |
+| `avatares` | avatares HeyGen de pessoas do perfil, com termo + consentimento gravado, aviso de IA e revogação |
 | `publicar-instagram` | fila, prévia, aprovação com trava por hash, publicação e métricas pela Graph API |
 
 O agente `dossie-social` é o modo dossiê da análise (acervo completo).
@@ -27,6 +29,11 @@ As skills `hyperframes*` vêm do plugin HyperFrames da conta, não deste reposit
 - **Criativo só com material do cliente.** Os scripts recusam mídia fora de
   `clientes/<handle>/` ou em pastas de referência de terceiros; não contorne
   (nem copiando o arquivo para dentro da pasta do cliente).
+- **Avatar só de maior de 18 anos com consentimento ativo** (termo registrado + consentimento
+  gravado pela própria pessoa no HeyGen). Nunca rode reconhecimento/agrupamento facial nos
+  vídeos do cliente; nunca edite `registro.json` à mão; revogação se atende no mesmo dia.
+- **Token do Instagram só pelo `conectar.py`** — nunca peça senha nem token no chat; o único dado
+  que transita é a URL de retorno com o código de uso único, que o `trocar` consome.
 - **Som só da biblioteca**, com licença no catálogo (`catalogo.py validar`).
 - **Credenciais só no `.env`** (ignorado pelo git) ou nas variáveis do ambiente.
 - `clientes/` fica fora do git — nunca force a adição de mídia ou dado de cliente.

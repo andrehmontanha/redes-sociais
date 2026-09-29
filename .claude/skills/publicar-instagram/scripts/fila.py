@@ -13,6 +13,7 @@ Uso:
 
 Estados: rascunho → aguardando_aprovacao → aprovado → publicado
                                          ↘ rejeitado        ↘ erro
+                                         ↘ cancelado (consentimento de avatar revogado)
 
 A trava: ao criar, a mídia é COPIADA para dentro do item (congelada) e o item
 ganha uma impressão digital — sha256 da mídia, da legenda, do tipo e do horário.
@@ -66,7 +67,7 @@ def impressao(item: Path, post):
     h = hashlib.sha256()
     for m in post["midias"] + ([post["capa"]] if post.get("capa") else []):
         h.update(sha(item / m).encode())
-    for campo in ("tipo", "legenda", "agendado_para", "thumb_offset_ms"):
+    for campo in ("tipo", "legenda", "agendado_para", "thumb_offset_ms", "avatares"):
         h.update(f"{campo}={post.get(campo)}".encode())
     return h.hexdigest()
 
@@ -80,6 +81,31 @@ def validar_legenda(legenda):
     if len(re.findall(r"(?<!\w)@[\w.]+", legenda)) > 20:
         erros.append("mais de 20 menções")
     return erros
+
+
+AVISO_IA = "Vídeo com avatar digital criado com IA, com autorização da pessoa retratada."
+
+
+def avatares_da_midia(midias):
+    """Pessoas cujos avatares aparecem na mídia: `avatares.json` ao lado do arquivo
+    (gerado pelo montar_reel.py) ou o manifesto `.json` do próprio vídeo de avatar."""
+    pessoas = set()
+    for m in midias:
+        for candidato in (m.parent / "avatares.json", m.with_suffix(".json")):
+            if candidato.exists():
+                dados = json.loads(candidato.read_text(encoding="utf-8"))
+                if isinstance(dados, dict) and dados.get("pessoa"):
+                    pessoas.add(dados["pessoa"])
+                elif isinstance(dados, dict) and isinstance(dados.get("avatares"), list):
+                    pessoas.update(dados["avatares"])
+    return sorted(pessoas)
+
+
+def verificador_avatares():
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "avatares" / "scripts"))
+    import avatar
+    avatar.RAIZ = RAIZ
+    return avatar
 
 
 def criar(a):
@@ -110,6 +136,14 @@ def criar(a):
         cred = m.with_suffix(".creditos.txt")
         if cred.exists():
             legenda = (legenda + "\n\n" + cred.read_text(encoding="utf-8").strip()).strip()
+    pessoas = sorted(set(avatares_da_midia(midias)) | set(filter(None, (a.avatares or "").split(","))))
+    if pessoas:
+        av = verificador_avatares()
+        impedimentos = [e for p in pessoas for e in av.verificar_uso(a.cliente, p)]
+        if impedimentos:
+            sys.exit("avatar sem liberação:\n  " + "\n  ".join(impedimentos))
+        if AVISO_IA.lower() not in legenda.lower():
+            legenda = (legenda + "\n\n" + AVISO_IA).strip()
     erros = validar_legenda(legenda)
     if erros:
         sys.exit("legenda inválida: " + "; ".join(erros))
@@ -144,6 +178,7 @@ def criar(a):
         "legenda": legenda,
         "agendado_para": agendado.isoformat() if agendado else None,
         "aprovacao": None,
+        "avatares": pessoas,
         "historico": [{"em": agora().isoformat(timespec="seconds"), "evento": "criado"}],
     }
     gravar(item, post)
@@ -180,6 +215,7 @@ dl{{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}} dt
 </style></head><body><main>
 <div class="cabeca"><h1 style="font-size:20px;margin:0">@{html.escape(post['cliente'])} · {post['tipo']}</h1>
 <span class="selo">aguardando aprovação</span></div>
+{f'<p class="selo" style="background:#e7f1ff;color:#0a3d7a;display:inline-block">contém avatar digital criado com IA: {html.escape(", ".join(post["avatares"]))}</p>' if post.get("avatares") else ""}
 <dl><dt>Publicação</dt><dd>{html.escape(quando)}</dd><dt>Peças</dt><dd>{len(post['midias'])}</dd>
 <dt>Item</dt><dd>{html.escape(item.name)}</dd></dl>
 <div class="midias">{''.join(cartoes)}</div>
@@ -203,8 +239,20 @@ def aprovar(a):
         sys.exit(f"item em '{post['status']}' — só se aprova o que teve prévia enviada")
     if len(a.por.strip()) < 2:
         sys.exit("--por precisa do nome de quem aprovou")
+    pessoas_ok = {p.strip().lower() for p in (a.pessoas or "").split(",") if p.strip()}
+    if post.get("avatares"):
+        av = verificador_avatares()
+        for p in post["avatares"]:
+            impedimentos = av.verificar_uso(post["cliente"], p)
+            if impedimentos:
+                sys.exit("avatar sem liberação:\n  " + "\n  ".join(impedimentos))
+            reg = av.ler(post["cliente"], p)
+            if reg["termo"]["exige_aprovacao_da_pessoa"] and reg["pessoa"]["nome"].lower() not in pessoas_ok:
+                sys.exit(f"o termo de {reg['pessoa']['nome']} exige que a própria pessoa aprove cada post — "
+                         f"mostre a prévia e registre com --pessoas \"{reg['pessoa']['nome']}\"")
     post["aprovacao"] = {"por": a.por.strip(), "em": agora().isoformat(timespec="seconds"),
-                         "impressao": impressao(item, post), "mensagem": a.mensagem}
+                         "impressao": impressao(item, post), "mensagem": a.mensagem,
+                         "pessoas_retratadas": sorted(pessoas_ok) or None}
     post["status"] = "aprovado"
     post["historico"].append({"em": post["aprovacao"]["em"], "evento": f"aprovado por {a.por.strip()}"})
     gravar(item, post)
@@ -245,9 +293,11 @@ def main():
     c.add_argument("--agendar", help="ISO 8601 com fuso, ex. 2026-10-02T18:00-03:00")
     c.add_argument("--capa")
     c.add_argument("--thumb-offset-ms", type=int)
+    c.add_argument("--avatares", help="slugs de avatares presentes (detectados sozinhos quando há avatares.json)")
     p = sub.add_parser("previa"); p.add_argument("item")
     ap_ = sub.add_parser("aprovar"); ap_.add_argument("item"); ap_.add_argument("--por", required=True)
     ap_.add_argument("--mensagem", help="texto da mensagem de aprovação do usuário, para o registro")
+    ap_.add_argument("--pessoas", help="nomes das pessoas retratadas por avatar que aprovaram (separados por vírgula)")
     r = sub.add_parser("rejeitar"); r.add_argument("item"); r.add_argument("--motivo", required=True)
     l = sub.add_parser("listar"); l.add_argument("--cliente"); l.add_argument("--status")
     a = ap.parse_args()
