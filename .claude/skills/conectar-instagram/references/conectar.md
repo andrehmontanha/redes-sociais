@@ -24,6 +24,11 @@ IG_REDIRECT_URI=https://seu-dominio.com.br/instagram/retorno
 IG_GRAPH_VERSION=v23.0
 ```
 
+**Com o webapp no ar**, use como `IG_REDIRECT_URI` do estúdio a página
+`https://redes-sociais-webapp.vercel.app/estudio/retorno` (cadastre-a na Meta ao lado da
+`/api/instagram/callback` do webapp). Ela não troca o código: só mostra a URL completa
+com botão de copiar, para colar no `conectar.py trocar`.
+
 O `conectar.py trocar` grava por cliente: `IG_<HANDLE>_USER_ID`, `IG_<HANDLE>_TOKEN`,
 `IG_<HANDLE>_TOKEN_EXPIRA` e `IG_<HANDLE>_GRAPH_HOST=graph.instagram.com`. O publicador
 usa essas mesmas chaves.
