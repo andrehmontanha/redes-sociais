@@ -1,0 +1,15 @@
+# credenciais — nunca no repositório
+.env
+.env.local
+
+# dados de clientes: mídia pesada e material de terceiros
+clientes/*
+!clientes/README.md
+
+# saídas de render e caches
+**/render/
+**/video/node_modules/
+**/.hyperframes/
+__pycache__/
+*.pyc
+.DS_Store

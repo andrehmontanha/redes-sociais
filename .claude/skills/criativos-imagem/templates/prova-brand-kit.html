@@ -1,0 +1,14 @@
+<!-- Prova visual do brand kit, para o humano confirmar a identidade antes de qualquer criativo. -->
+<div class="quadro">
+  <div class="area" style="gap:36px">
+    <div class="rotulo">brand kit · {{titulo}}</div>
+    <div style="display:flex;gap:16px">
+      {{#papeis}}<div style="flex:1"><div style="height:150px;background:{{hex}};border:2px solid rgba(127,127,127,.35);border-radius:var(--raio)"></div><div class="texto" style="font-size:24px;margin-top:10px">{{nome}}<br>{{hex}}</div></div>{{/papeis}}
+    </div>
+    <div style="display:flex;gap:8px">{{#paleta}}<div style="flex:1;height:44px;background:{{.}}"></div>{{/paleta}}</div>
+    <h1 class="titulo" style="font-size:88px">{{#amostra_titulo}}{{amostra_titulo}}{{/amostra_titulo}}{{^amostra_titulo}}Título na fonte da marca{{/amostra_titulo}}</h1>
+    <p class="texto">{{#amostra_texto}}{{amostra_texto}}{{/amostra_texto}}{{^amostra_texto}}Texto corrido como vai aparecer nas legendas das artes, com o peso e o espaçamento definidos no kit.{{/amostra_texto}}</p>
+    <div class="texto" style="font-size:26px;opacity:.8">Título: {{fonte_titulo}} · Texto: {{fonte_texto}}<br>Fotos: {{tratamento}}</div>
+    <div class="cta">Botão de destaque</div>
+  </div>
+</div>

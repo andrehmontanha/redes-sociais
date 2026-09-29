@@ -1,0 +1,26 @@
+<!-- Foto do cliente em tela cheia com título. O tratamento do texto segue
+     brand-kit.composicao.texto_sobre_foto: degrade, faixa, direto ou nunca. -->
+<div class="quadro {{classe_alinhamento}} {{^tratamento_nunca}}com-foto{{/tratamento_nunca}}">
+  {{^tratamento_nunca}}
+  <img class="foto" src="{{foto}}" alt="">
+  {{#tratamento_degrade}}<div class="veu-degrade"></div>{{/tratamento_degrade}}
+  <div class="area" style="justify-content:flex-end">
+    <div class="{{#tratamento_faixa}}faixa{{/tratamento_faixa}}{{^tratamento_faixa}}sobre-foto{{/tratamento_faixa}}" style="display:flex;flex-direction:column;gap:20px;max-height:55%">
+      {{#rotulo}}<div class="rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
+      <h1 class="titulo ajustar" data-campo="titulo" style="max-height:420px">{{titulo}}</h1>
+      {{#subtitulo}}<p class="subtitulo ajustar" data-campo="subtitulo" data-min="28" style="max-height:170px">{{subtitulo}}</p>{{/subtitulo}}
+    </div>
+  </div>
+  {{/tratamento_nunca}}
+  {{#tratamento_nunca}}
+  <img class="foto" src="{{foto}}" alt="" style="height:68%">
+  <div class="area" style="top:calc(68% + 40px)">
+    <h1 class="titulo ajustar" data-campo="titulo" style="font-size:72px;flex:1">{{titulo}}</h1>
+  </div>
+  {{/tratamento_nunca}}
+  {{#logo}}<img class="logo {{posicao_logo}}" src="{{logo}}" alt="">{{/logo}}
+  <div class="rodape">
+    <span class="assinatura">{{assinatura}}</span>
+    {{#carrossel}}<span class="contador">{{indice}}/{{total}}</span>{{/carrossel}}
+  </div>
+</div>

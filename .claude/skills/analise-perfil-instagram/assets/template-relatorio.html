@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Análise de perfil — @{{handle}}</title>
+<!--
+  Template autocontido: nenhum recurso externo, abre em qualquer navegador e
+  imprime em PDF sem quebrar.
+
+  Se for publicar como Artifact, remova &lt;!doctype&gt;, &lt;html&gt;, &lt;head&gt; e &lt;body&gt; e
+  mantenha só o &lt;style&gt; e o conteúdo — o publicador injeta o esqueleto.
+
+  ESTE HTML NÃO É O MARKDOWN COM ESTILO. Ele carrega o que só funciona
+  visualmente: os exemplos concretos que sustentam cada achado, as correlações
+  em barras comparáveis, os cards de tendência com estágio e janela, o
+  calendário e os roteiros. Um relatório que afirma "conteúdo cultural rende 3x
+  mais" e mostra os dois posts lado a lado convence; um que só afirma, não.
+
+  Preencha ou REMOVA cada bloco {{...}}. Um placeholder esquecido no relatório
+  entregue ao cliente é pior do que a seção ausente. Blocos de exemplo estão
+  marcados com <!-- repetir --> onde a repetição é esperada.
+-->
+<style>
+  :root{
+    --bg:#fbfaf9; --surface:#fff; --surface-2:#f5f2ef; --border:#e6e2dd; --text:#1c1a17;
+    --muted:#6b6560; --accent:#0e7490; --ok:#15803d; --warn:#b45309; --bad:#b91c1c;
+    --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.04);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#141312; --surface:#1c1b19; --surface-2:#232120; --border:#2f2c29; --text:#f0ede9;
+      --muted:#9c948c; --accent:#67e8f9; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#141312; --surface:#1c1b19; --surface-2:#232120; --border:#2f2c29; --text:#f0ede9;
+    --muted:#9c948c; --accent:#67e8f9; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font:16px/1.65 ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:900px;margin:0 auto;padding:56px 24px 96px}
+  header{border-bottom:1px solid var(--border);padding-bottom:28px;margin-bottom:40px}
+  .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:650}
+  h1{font-size:clamp(28px,4.5vw,40px);line-height:1.15;margin:10px 0 6px;letter-spacing:-.02em}
+  .meta{color:var(--muted);font-size:14px}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+     margin:56px 0 16px;font-weight:650}
+  h3{font-size:17px;margin:28px 0 8px;letter-spacing:-.01em}
+  p{margin:0 0 14px}
+  a{color:var(--accent)}
+  code{background:var(--surface-2);padding:1px 5px;border-radius:4px;font-size:.9em}
+
+  .verdict{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);
+    border-radius:12px;padding:24px 26px;box-shadow:var(--shadow);
+    font-size:18px;line-height:1.55;letter-spacing:-.01em;}
+
+  /* ---------- KPIs ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
+  .kpi .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .kpi .value{font-size:28px;font-weight:650;letter-spacing:-.02em;margin-top:6px;font-variant-numeric:tabular-nums}
+  .kpi .note{font-size:13px;color:var(--muted);margin-top:2px}
+  .tag{display:inline-block;font-size:12px;font-weight:650;padding:2px 9px;border-radius:999px;border:1px solid currentColor}
+  .tag.ok{color:var(--ok)} .tag.warn{color:var(--warn)} .tag.bad{color:var(--bad)} .tag.info{color:var(--accent)}
+
+  /* ---------- Tabelas ---------- */
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;width:100%;font-size:15px;min-width:540px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:650}
+  tbody tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:6px;min-width:70px}
+  .bar > span{display:block;height:100%;background:var(--accent);border-radius:3px}
+
+  /* ---------- Correlação: barras comparáveis entre si ----------
+     Use quando duas ou mais categorias precisam ser COMPARADAS, não só listadas.
+     A largura de cada barra é o valor dividido pelo maior valor do grupo. -->  */
+  .corr{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+        padding:20px 22px;box-shadow:var(--shadow);margin:18px 0}
+  .corr .title{font-size:14px;font-weight:650;margin-bottom:4px}
+  .corr .sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+  .row{display:grid;grid-template-columns:minmax(90px,1.1fr) 3fr auto;gap:12px;align-items:center;margin-bottom:10px}
+  .row .name{font-size:14px}
+  .row .track{background:var(--surface-2);border-radius:5px;height:22px;overflow:hidden}
+  .row .fill{height:100%;background:var(--accent);border-radius:5px}
+  .row .fill.dim{background:var(--border)}
+  .row .fill.bad{background:var(--bad)}
+  .row .val{font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+  .corr .read{font-size:13px;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px dashed var(--border)}
+
+  /* ---------- Gap: atual vs meta em uma régua ---------- */
+  .gap{display:flex;align-items:center;gap:10px;margin:22px 0 6px}
+  .gap .track{flex:1;height:26px;background:var(--surface-2);border-radius:6px;position:relative;overflow:hidden}
+  .gap .fill{position:absolute;left:0;top:0;bottom:0;background:var(--bad);border-radius:6px}
+  .gap .goal{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ok)}
+  .gap .cap{font-size:12px;color:var(--muted);white-space:nowrap}
+
+  /* ---------- Cards de exemplo (posts que sustentam o achado) ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:16px 0}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+  .card.win{border-top:3px solid var(--ok)}
+  .card.lose{border-top:3px solid var(--bad)}
+  .card.ref{border-top:3px solid var(--accent)}
+  .card .who{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+  .card .what{font-size:15px;font-weight:600;margin:8px 0 6px;line-height:1.35}
+  .card .nums{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .card .why{font-size:13px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);color:var(--muted)}
+
+  /* ---------- Achados ---------- */
+  .finding{border-left:2px solid var(--border);padding:2px 0 2px 18px;margin:0 0 24px}
+  .finding.good{border-color:var(--ok)} .finding.bad{border-color:var(--bad)}
+  .finding h3{margin-top:0}
+  .finding .evidence{font-size:14px;color:var(--muted)}
+
+  /* ---------- Tendências ---------- */
+  .trend{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+         padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .trend .top{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+  .trend .nome{font-size:16px;font-weight:650;letter-spacing:-.01em;margin-right:auto}
+  .badge{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+         padding:3px 9px;border-radius:999px}
+  .badge.emergente{background:rgba(21,128,61,.14);color:var(--ok)}
+  .badge.pico{background:rgba(14,116,144,.14);color:var(--accent)}
+  .badge.saturando{background:rgba(180,83,9,.14);color:var(--warn)}
+  .badge.saindo{background:rgba(185,28,28,.14);color:var(--bad)}
+  .trend .janela{display:flex;align-items:center;gap:10px;margin:12px 0 4px}
+  .trend .janela .track{flex:1;height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+  .trend .janela .fill{height:100%;border-radius:4px;background:var(--accent)}
+  .trend .janela .cap{font-size:12px;color:var(--muted);white-space:nowrap}
+  .trend .pauta{font-size:14px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border)}
+  .trend .pauta dt{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:8px}
+  .trend .pauta dd{margin:2px 0 0}
+
+  /* ---------- Calendário e roteiro ---------- */
+  .chip{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;
+        background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+  .script{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+          padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .script h3{margin-top:0}
+  .script table{min-width:480px;font-size:14px}
+  .script .legenda{font-size:14px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--border);
+                   white-space:pre-wrap}
+
+  /* ---------- Plano de ação ---------- */
+  ol.actions{list-style:none;counter-reset:a;padding:0;margin:0}
+  ol.actions li{counter-increment:a;background:var(--surface);border:1px solid var(--border);
+    border-radius:12px;padding:18px 20px 18px 58px;margin-bottom:12px;position:relative;box-shadow:var(--shadow)}
+  ol.actions li::before{content:counter(a);position:absolute;left:20px;top:18px;width:24px;height:24px;
+    border-radius:7px;background:var(--accent);color:#04202a;font-size:13px;font-weight:700;
+    display:grid;place-items:center}
+  ol.actions .why{font-size:14px;color:var(--muted);margin-top:6px}
+  ol.actions .how{font-size:13px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)}
+
+  .limits{background:var(--surface);border:1px dashed var(--border);border-radius:12px;padding:20px 24px;
+    font-size:14px;color:var(--muted)}
+  .limits ul{margin:8px 0 0;padding-left:18px} .limits li{margin-bottom:8px}
+  footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+  @media print{body{background:#fff}.wrap{padding:0}.kpi,ol.actions li,.trend,.card,.corr,.script{box-shadow:none}
+    h2{margin-top:32px}.scroll{overflow:visible}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Análise de perfil · Instagram</div>
+    <h1>@{{handle}}</h1>
+    <div class="meta">
+      Coletado em {{data}} · {{n}} posts próprios ({{período}}) · nicho {{nicho}} · objetivo do cliente: {{objetivo}}
+    </div>
+  </header>
+
+  <div class="verdict">{{Uma frase com a verdade central do perfil.}}</div>
+
+  <!-- ============ NÚMEROS ============ -->
+  <h2>Números-chave</h2>
+  <div class="kpis">
+    <div class="kpi">
+      <div class="label">Seguidores</div>
+      <div class="value">{{seguidores}}</div>
+      <div class="note">{{n}} publicações · faixa {{faixa}}</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Engajamento ({{média|mediana}})</div>
+      <div class="value">{{er}}%</div>
+      <div class="note"><span class="tag {{ok|warn|bad}}">{{classificação}}</span> · saudável {{piso}}–{{teto}}% no nicho</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Comentário / curtida</div>
+      <div class="value">{{cl}}%</div>
+      <div class="note">normal entre 1% e 5%</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Cadência própria</div>
+      <div class="value">{{x}}<span style="font-size:16px;font-weight:500">/sem</span></div>
+      <div class="note">{{y}}/sem contando collabs</div>
+    </div>
+  </div>
+
+  <!-- Régua atual vs meta. Remova se o perfil já está dentro do benchmark. -->
+  <div class="gap">
+    <span class="cap">0%</span>
+    <div class="track">
+      <div class="fill" style="width:{{er/teto*100}}%"></div>
+      <div class="goal" style="left:{{piso/teto*100}}%" title="piso saudável"></div>
+    </div>
+    <span class="cap">{{teto}}%</span>
+  </div>
+  <p style="font-size:13px;color:var(--muted);margin-top:0">
+    A barra é o engajamento atual ({{er}}%); a marca verde é o piso saudável do nicho ({{piso}}%).
+  </p>
+
+  <!-- ============ AUDITORIA ============ -->
+  <h2>Auditoria do perfil — {{nota}}/10</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Item</th><th class="num">Nota</th><th>O que está lá e o que isso causa</th></tr></thead>
+      <tbody>
+        <!-- repetir por item: foto, nome de exibição, @, bio, link, destaques, grade, contato e categoria -->
+        <tr>
+          <td>{{item}}</td>
+          <td class="num">{{n}}<div class="bar"><span style="width:{{n*10}}%"></span></div></td>
+          <td>{{justificativa citando o que existe no perfil}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:16px"><strong>O que mais pesa:</strong> {{o item de menor nota com maior impacto no objetivo declarado, em duas frases}}</p>
+
+  <!-- ============ CONTEÚDO E CORRELAÇÕES ============ -->
+  <h2>Conteúdo</h2>
+
+  <!-- Correlação 1: pilar × desempenho. É aqui que quase sempre aparece o
+       descompasso entre onde está o esforço e onde está o retorno. -->
+  <div class="corr">
+    <div class="title">Onde está o esforço × onde está o retorno</div>
+    <div class="sub">Barra cheia = pilar com melhor engajamento mediano. O número entre parênteses é a fatia dos posts.</div>
+    <!-- repetir por pilar -->
+    <div class="row">
+      <div class="name">{{pilar}}</div>
+      <div class="track"><div class="fill" style="width:{{er_do_pilar/maior_er*100}}%"></div></div>
+      <div class="val">{{er}}% ({{x}}% dos posts)</div>
+    </div>
+    <div class="read">{{A leitura: qual pilar rende mais, qual ocupa mais espaço, e o que isso significa em realocação de calendário.}}</div>
+  </div>
+
+  <!-- Correlação 2: formato × desempenho -->
+  <div class="corr">
+    <div class="title">Formato × desempenho</div>
+    <div class="sub">{{O que muda quando o formato muda — e se a distribuição atual acompanha isso.}}</div>
+    <div class="row">
+      <div class="name">{{formato}}</div>
+      <div class="track"><div class="fill" style="width:{{proporcional}}%"></div></div>
+      <div class="val">{{er}}% ({{x}}% dos posts)</div>
+    </div>
+    <div class="read">{{Leitura.}}</div>
+  </div>
+
+  <!-- ============ EXEMPLOS QUE SUSTENTAM O ACHADO ============
+       Esta é a seção que o cliente mais olha. Mostre os posts concretos,
+       lado a lado, com o número que os separa. Sem isso o relatório é opinião. -->
+  <h3>Os posts que explicam o padrão</h3>
+  <div class="cards">
+    <!-- repetir: 2 a 3 vencedores (win) e 1 a 2 perdedores (lose) -->
+    <div class="card win">
+      <div class="who"><span>{{@perfil}}</span><span>{{data}}</span></div>
+      <div class="what">{{tema do post em uma linha}}</div>
+      <div class="nums">{{curtidas}} curtidas · {{comentários}} comentários · {{compartilhamentos}} compart. · ER {{er}}%</div>
+      <div class="why">{{O que este post fez que os outros não fizeram.}}</div>
+    </div>
+    <div class="card lose">
+      <div class="who"><span>{{@perfil}}</span><span>{{data}}</span></div>
+      <div class="what">{{tema}}</div>
+      <div class="nums">{{métricas}}</div>
+      <div class="why">{{O atributo que separa este dos vencedores.}}</div>
+    </div>
+  </div>
+
+  <!-- Exemplos similares de FORA do perfil: o que perfis do nicho fizeram e
+       funcionou. Serve para extrair o padrão, nunca para copiar o conteúdo. -->
+  <h3>Referências do nicho — o que já funciona por aí</h3>
+  <div class="cards">
+    <!-- repetir 2 a 4 -->
+    <div class="card ref">
+      <div class="who"><span>{{@referência}}</span><span>{{data}}</span></div>
+      <div class="what">{{o que o post faz}}</div>
+      <div class="nums">{{métricas visíveis}}</div>
+      <div class="why">{{O padrão a extrair — o gancho, a estrutura, o motivo de funcionar — e como adaptar para esta marca.}}</div>
+    </div>
+  </div>
+
+  <h3>O que funciona</h3>
+  <div class="finding good">
+    <h3>{{Padrão em uma linha}}</h3>
+    <p>{{Por que funciona.}}</p>
+    <div class="evidence">Evidência: {{posts, datas e números que sustentam}}</div>
+  </div>
+
+  <h3>O que não funciona</h3>
+  <div class="finding bad">
+    <h3>{{Padrão em uma linha}}</h3>
+    <p>{{O custo disso para o objetivo do cliente.}}</p>
+    <div class="evidence">Evidência: {{posts, datas e números}}</div>
+  </div>
+
+  <!-- ============ ENGAJAMENTO ============ -->
+  <h2>Engajamento</h2>
+  <p>{{Interpretação: média x mediana, dependência de virais, comparação com o nicho, sinais a investigar.}}</p>
+
+  <!-- ============ TENDÊNCIAS ============ -->
+  <h2>Tendências e oportunidades</h2>
+  <p style="font-size:14px;color:var(--muted)">
+    Janela restante é <strong>projeção</strong>, calculada a partir da duração típica da categoria ajustada por
+    crescimento, pico e adoção pelo nicho. Serve para decidir prazo de produção, não como previsão.
+  </p>
+
+  <!-- repetir por tendência aprovada, na ordem de decisão: urgente → entrar → condicional -->
+  <div class="trend">
+    <div class="top">
+      <span class="nome">{{nome da tendência}}</span>
+      <span class="badge {{emergente|pico|saturando|saindo}}">{{estágio}}</span>
+      <span class="tag info">aderência {{n}}/10</span>
+    </div>
+    <div class="meta" style="font-size:13px">{{tipo}} · camada {{nicho|geral|ambas}} · {{n}} perfis do nicho já usaram</div>
+    <div class="janela">
+      <span class="cap">janela</span>
+      <div class="track"><div class="fill" style="width:{{janela/duração_típica*100}}%"></div></div>
+      <span class="cap">{{n}} dias</span>
+    </div>
+    <dl class="pauta">
+      <dt>Ideia</dt><dd>{{uma linha}}</dd>
+      <dt>Formato</dt><dd>{{formato e duração}}</dd>
+      <dt>Áudio</dt><dd><a href="{{link do áudio}}">{{nome}}</a> · {{volume}} Reels</dd>
+      <dt>Gancho</dt><dd>"{{a primeira linha, escrita — não descrita}}"</dd>
+      <dt>CTA</dt><dd>{{coerente com o formato e com o objetivo do cliente}}</dd>
+      <dt>Pilar</dt><dd>{{qual pilar reforça}}</dd>
+    </dl>
+  </div>
+
+  <!-- ============ CALENDÁRIO ============ -->
+  <h2>Calendário editorial — {{n}} semanas</h2>
+  <p style="font-size:14px;color:var(--muted)">
+    Cadência baseada no que o cliente consegue sustentar, não no ideal. De 20% a 30% dos slots são conteúdo
+    perene do pilar de melhor desempenho — um calendário 100% de trends deixa a conta refém do que estiver
+    bombando e apaga a identidade da marca.
+  </p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Semana</th><th>Dia</th><th>Formato</th><th>Pauta</th><th>Pilar</th></tr></thead>
+      <tbody>
+        <!-- repetir por slot -->
+        <tr>
+          <td>{{S1}}</td><td>{{seg}}</td><td>{{Reel}}</td>
+          <td>{{pauta}}</td><td><span class="chip">{{pilar}}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ ROTEIROS ============ -->
+  <h2>Roteiros</h2>
+  <!-- repetir para as 2 ou 3 melhores pautas -->
+  <div class="script">
+    <h3>{{título da pauta}}</h3>
+    <div class="meta" style="font-size:13px">{{formato}} · {{duração}} · áudio: {{nome}}</div>
+    <div class="scroll" style="margin-top:12px">
+      <table>
+        <thead><tr><th>Tempo</th><th>Cena</th><th>Texto na tela</th><th>Áudio</th></tr></thead>
+        <tbody>
+          <tr><td>0–2s</td><td>{{o que aparece}}</td><td>{{o gancho, escrito}}</td><td>{{entrada}}</td></tr>
+          <!-- repetir por cena -->
+        </tbody>
+      </table>
+    </div>
+    <div class="legenda"><strong>Legenda:</strong> {{texto completo da legenda, com CTA e hashtags}}</div>
+  </div>
+
+  <!-- ============ PLANO ============ -->
+  <h2>Plano de ação</h2>
+  <ol class="actions">
+    <!-- 5 a 8, ordenadas pelo impacto no objetivo DECLARADO do cliente -->
+    <li>
+      <strong>{{Ação específica}}</strong>
+      <div class="why">{{Achado que a origina.}}</div>
+      <div class="how">Medir por {{métrica}} · prazo {{prazo}}</div>
+    </li>
+  </ol>
+
+  <!-- ============ LIMITAÇÕES ============ -->
+  <h2>Limitações</h2>
+  <div class="limits">
+    <ul>
+      <li>Amostra de {{n}} posts próprios cobrindo {{período}} — {{robustez}}.</li>
+      <li>Visualizações de Reels não são expostas a visitantes na versão web; compartilhamentos foram usados como melhor substituto.</li>
+      <li>{{Outros dados não coletados e o motivo.}}</li>
+      <li>As janelas de tendência são projeções baseadas em duração típica por categoria, não previsões.</li>
+      <li>Alcance, impressões, salvamentos e demografia só existem no Insights da conta. {{Como obter.}}</li>
+    </ul>
+  </div>
+
+  <footer>
+    Dados observados publicamente no Instagram em {{data}}. Métricas de engajamento calculadas sobre a amostra
+    citada e são estimativas — números oficiais de alcance e impressões só aparecem no Insights da conta.
+  </footer>
+
+</div>
+</body>
+</html>

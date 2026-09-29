@@ -1,0 +1,259 @@
+{
+  "itens": [
+    {
+      "id": "brilho",
+      "tipo": "sfx",
+      "arquivo": "sfx/brilho.wav",
+      "categoria": "destaque",
+      "familia": "sutil",
+      "duracao_s": 1.3,
+      "uso": "produto em destaque, antes/depois, brilho",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "clique",
+      "tipo": "sfx",
+      "arquivo": "sfx/clique.wav",
+      "categoria": "ui",
+      "familia": "sutil",
+      "duracao_s": 0.025,
+      "uso": "botão, seleção, item de lista",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "digitacao",
+      "tipo": "sfx",
+      "arquivo": "sfx/digitacao.wav",
+      "categoria": "ui",
+      "familia": "sutil",
+      "duracao_s": 1.2,
+      "uso": "texto sendo digitado na tela",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "ding",
+      "tipo": "sfx",
+      "arquivo": "sfx/ding.wav",
+      "categoria": "destaque",
+      "familia": "sutil",
+      "duracao_s": 1.6,
+      "uso": "acerto, check, dica",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "glitch",
+      "tipo": "sfx",
+      "arquivo": "sfx/glitch.wav",
+      "categoria": "transicao",
+      "familia": "impacto",
+      "duracao_s": 0.35,
+      "uso": "erro proposital, virada de tom",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "hit-seco",
+      "tipo": "sfx",
+      "arquivo": "sfx/hit-seco.wav",
+      "categoria": "impacto",
+      "familia": "impacto",
+      "duracao_s": 0.3,
+      "uso": "texto que entra batendo, corte no beat",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "impacto-grave",
+      "tipo": "sfx",
+      "arquivo": "sfx/impacto-grave.wav",
+      "categoria": "impacto",
+      "familia": "impacto",
+      "duracao_s": 1.4,
+      "uso": "revelação, número grande, logo final",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "notificacao",
+      "tipo": "sfx",
+      "arquivo": "sfx/notificacao.wav",
+      "categoria": "ui",
+      "familia": "sutil",
+      "duracao_s": 0.43,
+      "uso": "mensagem, alerta, novidade",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "obturador",
+      "tipo": "sfx",
+      "arquivo": "sfx/obturador.wav",
+      "categoria": "foto",
+      "familia": "sutil",
+      "duracao_s": 0.22,
+      "uso": "foto congelando, bastidor",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "pop",
+      "tipo": "sfx",
+      "arquivo": "sfx/pop.wav",
+      "categoria": "ui",
+      "familia": "sutil",
+      "duracao_s": 0.09,
+      "uso": "elemento aparecendo, bolha, emoji",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "riser",
+      "tipo": "sfx",
+      "arquivo": "sfx/riser.wav",
+      "categoria": "tensao",
+      "familia": "impacto",
+      "duracao_s": 2.0,
+      "uso": "subida antes do gancho ou do CTA",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "swipe",
+      "tipo": "sfx",
+      "arquivo": "sfx/swipe.wav",
+      "categoria": "transicao",
+      "familia": "sutil",
+      "duracao_s": 0.28,
+      "uso": "deslize de card, troca de slide",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "swoosh-reverso",
+      "tipo": "sfx",
+      "arquivo": "sfx/swoosh-reverso.wav",
+      "categoria": "transicao",
+      "familia": "impacto",
+      "duracao_s": 0.8,
+      "uso": "antes de um corte seco ou revelação",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "whoosh-curto",
+      "tipo": "sfx",
+      "arquivo": "sfx/whoosh-curto.wav",
+      "categoria": "transicao",
+      "familia": "impacto",
+      "duracao_s": 0.45,
+      "uso": "troca de cena rápida, texto entrando de lado",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "whoosh-longo",
+      "tipo": "sfx",
+      "arquivo": "sfx/whoosh-longo.wav",
+      "categoria": "transicao",
+      "familia": "impacto",
+      "duracao_s": 1.1,
+      "uso": "transição lenta, mudança de bloco",
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "ambiente-calmo",
+      "tipo": "trilha",
+      "arquivo": "trilhas/ambiente-calmo.m4a",
+      "clima": "calmo",
+      "bpm": 72,
+      "duracao_s": 26.67,
+      "uso": "bem-estar, hospitalidade, depoimento",
+      "loop": true,
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "energetico-124bpm",
+      "tipo": "trilha",
+      "arquivo": "trilhas/energetico-124bpm.m4a",
+      "clima": "energetico",
+      "bpm": 124,
+      "duracao_s": 30.97,
+      "uso": "oferta, lançamento, antes/depois rápido",
+      "loop": true,
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    },
+    {
+      "id": "pulso-leve-100bpm",
+      "tipo": "trilha",
+      "arquivo": "trilhas/pulso-leve-100bpm.m4a",
+      "clima": "leve",
+      "bpm": 100,
+      "duracao_s": 38.4,
+      "uso": "institucional, dicas, bastidores",
+      "loop": true,
+      "licenca": {
+        "tipo": "propria",
+        "descricao": "sintetizado por gerar_biblioteca.py — obra própria, sem direitos de terceiros",
+        "credito_obrigatorio": false
+      }
+    }
+  ]
+}

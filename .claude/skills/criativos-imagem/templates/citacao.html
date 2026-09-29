@@ -1,0 +1,16 @@
+<!-- Prova social: depoimento real de cliente. Nunca invente depoimento. -->
+<div class="quadro {{classe_alinhamento}}">
+  <div class="area" style="justify-content:center">
+    <div style="font-family:var(--fonte-titulo);font-size:200px;line-height:.6;color:var(--primaria)">“</div>
+    <blockquote class="titulo ajustar" data-campo="citacao" data-min="36" style="font-size:64px;line-height:1.2;max-height:58%">{{citacao}}</blockquote>
+    <div style="display:flex;gap:24px;align-items:center">
+      {{#foto}}<img src="{{foto}}" alt="" style="width:112px;height:112px;border-radius:50%;object-fit:cover">{{/foto}}
+      <div class="seguro" data-campo="autor"><div class="subtitulo" style="font-weight:700">{{autor}}</div>{{#contexto}}<div class="texto" style="opacity:.75">{{contexto}}</div>{{/contexto}}</div>
+    </div>
+  </div>
+  {{#logo}}<img class="logo {{posicao_logo}}" src="{{logo}}" alt="">{{/logo}}
+  <div class="rodape">
+    <span class="assinatura">{{assinatura}}</span>
+    {{#carrossel}}<span class="contador">{{indice}}/{{total}}</span>{{/carrossel}}
+  </div>
+</div>

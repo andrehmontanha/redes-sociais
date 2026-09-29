@@ -1,0 +1,15 @@
+<!-- Oferta/CTA: produto ou serviço, preço opcional, chamada para ação. -->
+<div class="quadro {{classe_alinhamento}}">
+  {{#foto}}<img class="foto" src="{{foto}}" alt="" style="height:56%">{{/foto}}
+  <div class="area" style="{{#foto}}top:calc(56% + 36px);{{/foto}}justify-content:center;gap:22px">
+    {{#rotulo}}<div class="rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
+    <h1 class="titulo ajustar" data-campo="titulo" style="font-size:80px;max-height:{{#foto}}42%{{/foto}}{{^foto}}40%{{/foto}}">{{titulo}}</h1>
+    {{#preco}}<div class="seguro" data-campo="preco" style="font-family:var(--fonte-titulo);font-weight:var(--peso-titulo);font-size:72px;color:var(--destaque)">{{preco}}</div>{{/preco}}
+    {{#cta}}<div class="cta seguro" data-campo="cta">{{cta}}</div>{{/cta}}
+  </div>
+  {{#logo}}<img class="logo {{posicao_logo}}" src="{{logo}}" alt="">{{/logo}}
+  <div class="rodape">
+    <span class="assinatura">{{assinatura}}</span>
+    {{#carrossel}}<span class="contador">{{indice}}/{{total}}</span>{{/carrossel}}
+  </div>
+</div>

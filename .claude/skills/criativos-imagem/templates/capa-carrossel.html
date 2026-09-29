@@ -1,0 +1,15 @@
+<!-- Primeira peça de carrossel: promessa + convite a arrastar. A foto é opcional. -->
+<div class="quadro {{classe_alinhamento}} {{#foto}}com-foto{{/foto}}">
+  {{#foto}}<img class="foto" src="{{foto}}" alt=""><div class="veu-degrade"></div>{{/foto}}
+  <div class="area {{#foto}}sobre-foto{{/foto}}" style="justify-content:flex-end">
+    {{#rotulo}}<div class="rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
+    <h1 class="titulo ajustar" data-campo="titulo" style="font-size:104px;max-height:58%">{{titulo}}</h1>
+    {{#subtitulo}}<p class="subtitulo ajustar" data-campo="subtitulo" data-min="28" style="max-height:18%">{{subtitulo}}</p>{{/subtitulo}}
+    <div class="arraste seguro" data-campo="arraste">{{#arraste}}{{arraste}}{{/arraste}}{{^arraste}}arraste para o lado →{{/arraste}}</div>
+  </div>
+  {{#logo}}<img class="logo {{posicao_logo}}" src="{{logo}}" alt="">{{/logo}}
+  <div class="rodape">
+    <span class="assinatura">{{assinatura}}</span>
+    {{#carrossel}}<span class="contador">{{indice}}/{{total}}</span>{{/carrossel}}
+  </div>
+</div>

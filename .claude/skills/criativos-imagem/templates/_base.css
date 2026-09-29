@@ -1,0 +1,71 @@
+/* Base comum a todos os templates. As cores, fontes, margem e raio vêm do
+   brand kit como variáveis CSS — nenhum template define cor ou fonte própria. */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; }
+body { width: var(--largura); height: var(--altura); overflow: hidden; }
+
+.quadro {
+  position: relative; width: var(--largura); height: var(--altura); overflow: hidden;
+  background: var(--fundo); color: var(--texto);
+  font-family: var(--fonte-texto); font-weight: var(--peso-texto);
+  text-align: var(--alinhamento);
+}
+
+/* Área segura: tudo que é texto vive aqui dentro. No story, a interface do
+   Instagram cobre ~250 px no topo e ~300 px na base. */
+.area {
+  position: absolute; inset: var(--margem);
+  bottom: calc(var(--margem) + 48px); /* espaço do rodapé (assinatura e contador) */
+  display: flex; flex-direction: column; gap: 28px;
+}
+.formato-story .area { top: 250px; bottom: 340px; }
+
+.titulo {
+  font-family: var(--fonte-titulo); font-weight: var(--peso-titulo);
+  text-transform: var(--caixa-titulo); line-height: 1.05; letter-spacing: -0.01em;
+  font-size: 96px; overflow: hidden;
+}
+.subtitulo { font-size: 40px; line-height: 1.3; overflow: hidden; }
+.texto { font-size: 36px; line-height: 1.4; overflow: hidden; }
+.rotulo {
+  font-size: 26px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--primaria); font-weight: 600;
+}
+.cta {
+  align-self: flex-start; background: var(--destaque); color: var(--fundo);
+  font-weight: 700; font-size: 34px; padding: 22px 40px; border-radius: var(--raio);
+}
+.centro .cta { align-self: center; }
+.centro .area { align-items: center; }
+
+/* Foto de fundo e tratamentos de texto sobre foto (composicao.texto_sobre_foto) */
+.foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.sobre-foto { color: var(--texto-sobre-foto); }
+.veu-degrade { position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.72) 100%); }
+.faixa { background: var(--fundo); color: var(--texto); padding: 36px 40px; border-radius: var(--raio); }
+
+/* Elementos de marca */
+.logo { position: absolute; height: 72px; width: auto; }
+.logo.topo-esquerda { top: var(--margem); left: var(--margem); }
+.logo.topo-direita { top: var(--margem); right: var(--margem); }
+.logo.topo-centro { top: var(--margem); left: 50%; transform: translateX(-50%); }
+.logo.rodape-esquerda { bottom: var(--margem); left: var(--margem); }
+.logo.rodape-direita { bottom: var(--margem); right: var(--margem); }
+.logo.rodape-centro { bottom: var(--margem); left: 50%; transform: translateX(-50%); }
+.formato-story .logo[class*="topo"] { top: 250px; }
+.formato-story .logo[class*="rodape"] { bottom: 300px; }
+
+.rodape {
+  position: absolute; left: var(--margem); right: var(--margem); bottom: calc(var(--margem) * .6);
+  display: flex; justify-content: space-between; font-size: 24px; opacity: .8;
+}
+.formato-story .rodape { bottom: 280px; }
+.contador { font-variant-numeric: tabular-nums; }
+.arraste { font-size: 26px; font-weight: 600; color: var(--primaria); }
+
+/* Sobre foto, tudo que é texto usa a cor de texto-sobre-foto — a primária da
+   marca costuma sumir no degradê escuro. */
+.sobre-foto .rotulo, .sobre-foto .arraste { color: var(--texto-sobre-foto); }
+.com-foto .rodape { color: var(--texto-sobre-foto); }

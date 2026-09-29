@@ -1,0 +1,13 @@
+<!-- Afirmação forte em fundo sólido da marca. Para frase de impacto, dado, pergunta. -->
+<div class="quadro {{classe_alinhamento}}">
+  <div class="area" style="justify-content:center">
+    {{#rotulo}}<div class="rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
+    <h1 class="titulo ajustar" data-campo="titulo" style="font-size:112px;max-height:62%">{{titulo}}</h1>
+    {{#subtitulo}}<p class="subtitulo ajustar" data-campo="subtitulo" data-min="28" style="max-height:22%">{{subtitulo}}</p>{{/subtitulo}}
+  </div>
+  {{#logo}}<img class="logo {{posicao_logo}}" src="{{logo}}" alt="">{{/logo}}
+  <div class="rodape">
+    <span class="assinatura">{{assinatura}}</span>
+    {{#carrossel}}<span class="contador">{{indice}}/{{total}}</span>{{/carrossel}}
+  </div>
+</div>
