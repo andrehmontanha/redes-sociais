@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { abrir, iguais, selar } from "../lib/cripto.ts";
 import { brutoDemo } from "../lib/demo.ts";
-import { formato, mediana, montarPosts, resumir } from "../lib/resumo.ts";
+import { capa, formato, mediana, montarPosts, resumir } from "../lib/resumo.ts";
 
 const SEGREDO = "x".repeat(40);
 
@@ -68,4 +68,24 @@ test("taxa de salvamento é salvamento sobre alcance", () => {
   });
   assert.equal(p.taxaSalvamento, 2.5);
   assert.equal(p.taxaCompartilhamento, 0.5);
+});
+
+test("capa nunca é um MP4", () => {
+  const base = { id: "1", timestamp: "2026-09-28T12:00:00+0000" };
+  assert.equal(capa({ ...base, media_type: "VIDEO", media_url: "https://x/v.mp4?a=1", thumbnail_url: "https://x/t.jpg" }), "https://x/t.jpg");
+  assert.equal(capa({ ...base, media_type: "IMAGE", media_url: "https://x/i.jpg" }), "https://x/i.jpg");
+  assert.equal(capa({ ...base, media_type: "CAROUSEL_ALBUM", media_url: "https://x/v.mp4",
+    children: { data: [{ id: "a", media_type: "VIDEO", media_url: "https://x/v.mp4", thumbnail_url: "https://x/c.jpg" }] } }), "https://x/c.jpg");
+  assert.equal(capa({ ...base, media_type: "CAROUSEL_ALBUM", media_url: "https://x/v.mp4" }), undefined);
+});
+
+test("rankings de salvamento ignoram zeros", () => {
+  const r = resumir({
+    perfil: { username: "x", followers_count: 50 }, conta_insights: {},
+    midias: ["1", "2", "3"].map((id) => ({ id, media_type: "IMAGE" as const, timestamp: "2026-09-28T12:00:00+0000" })),
+    insights: { "1": { reach: 100, saved: 0, shares: 0 }, "2": { reach: 50, saved: 2, shares: 0 }, "3": { reach: 20, saved: 0, shares: 1 } },
+  });
+  assert.deepEqual(r.topSalvamento.map((p) => p.id), ["2"]);
+  assert.deepEqual(r.topCompartilhamento.map((p) => p.id), ["3"]);
+  assert.equal(r.topAlcance.length, 3);
 });

@@ -48,16 +48,30 @@ function partesNoFuso(iso: string, fuso: string) {
 const taxa = (a: number | null | undefined, b: number | null | undefined) =>
   a != null && b ? Math.round((a / b) * 10000) / 100 : null;
 
+const ehVideo = (url?: string) => !!url && /\.(mp4|mov)(\?|$)/i.test(url);
+
+/** Imagem desenhável do post. Vídeo e carrossel que abre com vídeo trazem o MP4
+ *  em media_url — isso não vai numa <img>; usa a capa (thumbnail_url). */
+export function capa(m: Midia): string | undefined {
+  const filhos = m.children?.data ?? [];
+  const candidatos = [
+    m.thumbnail_url,
+    m.media_type === "IMAGE" ? m.media_url : undefined,
+    ...filhos.map((c) => c.thumbnail_url ?? (c.media_type === "IMAGE" ? c.media_url : undefined)),
+    m.media_type === "CAROUSEL_ALBUM" ? m.media_url : undefined,
+  ];
+  return candidatos.find((u) => u && !ehVideo(u));
+}
+
 export function montarPosts(bruto: Bruto, fuso = "America/Sao_Paulo"): Post[] {
   return bruto.midias.map((m) => {
     const ins = bruto.insights[m.id] ?? {};
     const { data, hora, h, dia } = partesNoFuso(m.timestamp.replace("+0000", "Z"), fuso);
     const legenda = m.caption ?? "";
     const alcance = ins.reach ?? null;
-    const primeiro = m.children?.data?.[0];
     return {
       id: m.id, url: m.permalink,
-      imagem: m.thumbnail_url ?? m.media_url ?? primeiro?.thumbnail_url ?? primeiro?.media_url,
+      imagem: capa(m),
       data, hora, dia, janela: Math.floor(h / 6), formato: formato(m), legenda,
       curtidas: ins.likes ?? m.like_count ?? null,
       comentarios: ins.comments ?? m.comments_count ?? null,
@@ -80,8 +94,11 @@ export type Resumo = ReturnType<typeof resumir>;
 export function resumir(bruto: Bruto, fuso = "America/Sao_Paulo") {
   const posts = montarPosts(bruto, fuso);
   const comAlcance = posts.filter((p) => p.alcance);
+  // ranking só com valor positivo: em conta pequena a maioria dos posts tem 0
+  // salvamentos, e uma lista de zeros não diz nada
   const top = (chave: keyof Post) =>
-    [...comAlcance].filter((p) => p[chave] != null).sort((a, b) => (b[chave] as number) - (a[chave] as number)).slice(0, 5);
+    [...comAlcance].filter((p) => ((p[chave] as number | null) ?? 0) > 0)
+      .sort((a, b) => (b[chave] as number) - (a[chave] as number)).slice(0, 5);
 
   const porFormato = Object.entries(
     comAlcance.reduce<Record<string, Post[]>>((g, p) => ((g[p.formato] ??= []).push(p), g), {}),

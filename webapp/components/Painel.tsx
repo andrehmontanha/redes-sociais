@@ -19,6 +19,7 @@ function Top({ titulo, explica, posts, valor }: {
   return (
     <section className="cartao">
       <div><h2>{titulo}</h2><p className="sub" style={{ fontSize: "0.85rem" }}>{explica}</p></div>
+      {posts.length === 0 && <p className="sub">Nenhum post com valor acima de zero nesta amostra.</p>}
       <ol className="tops" style={{ listStyle: "none", margin: 0, padding: 0 }}>
         {posts.map((p) => (
           <li key={p.id} className="top">
