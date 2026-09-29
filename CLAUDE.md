@@ -49,6 +49,18 @@ python .claude/skills/efeitos-sonoros/scripts/gerar_biblioteca.py   # regenera a
 
 Rode o teste de ponta a ponta depois de mexer em qualquer script ou template.
 
+## Webapp (`webapp/`, Next.js 16 → Vercel)
+
+Painel para conectar o Instagram (login oficial ou token de teste do modo dev) e ler
+métricas internas. Tokens ficam criptografados em cookie httpOnly; tudo exige
+`ESTUDIO_SENHA`, menos `/entrar` e a demonstração. Nunca implemente login por
+usuário e senha do Instagram. Next 16: `proxy.ts` (não `middleware.ts`), `params`
+e `cookies()` assíncronos.
+
+```bash
+cd webapp && npm install && npm test && npm run build
+```
+
 ## Convenções
 
 - Scripts em Python 3.11, nomes e mensagens em português, `argparse` com a docstring
