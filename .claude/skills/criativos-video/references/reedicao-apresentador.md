@@ -55,7 +55,7 @@ Caminhos relativos à pasta do roteiro.
 Ícones da biblioteca (`reeditar_apresentador.py --icones`): loja, predio-medio,
 predio-grande, torre, tesoura, secador, chave, chat-ia, chip, faisca, relogio (com
 `icone_texto` opcional), check (traço animado), calendario, sino, lua, pessoa,
-seta-cresce. Precisa de outro? Desenhe no script, genérico e original, no mesmo traço.
+seta-cresce, balanca. Precisa de outro? Desenhe no script, genérico e original, no mesmo traço.
 
 ## De onde vêm os tempos
 

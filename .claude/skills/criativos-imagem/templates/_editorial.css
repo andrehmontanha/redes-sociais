@@ -107,3 +107,19 @@
 /* ilustrações ocupam o palco (recortes do feed costumam ter ~300 px; até ~1,5x sem perder nitidez) */
 .ed-ponto .ed-palco img, .ed-card .ed-palco img, .ed-capa-topo .ed-palco img, .ed-capa-coluna .ed-palco img { width: 88%; height: 84%; }
 .ed-ponto .ed-palco.circulo { height: 420px; top: 330px; }
+
+/* anúncio estático único (4:5): título largo no alto, texto em coluna, ilustração à
+   direita e botão de contato na base — tudo dentro da margem */
+.ed-anuncio .ed-bloco { position: absolute; left: var(--margem); right: var(--margem); top: 240px;
+  display: flex; flex-direction: column; gap: 30px; }
+.ed-anuncio .ed-titulo { font-size: 98px; max-height: 420px; }
+.ed-anuncio .ed-texto { font-size: 38px; width: 470px; max-height: 260px; color: var(--fg); opacity: .9; }
+.ed-anuncio .ed-palco { right: 24px; bottom: 200px; width: 540px; height: 520px; }
+.ed-anuncio .ed-palco img { width: 92%; height: 90%; }
+.ed-anuncio .ed-botao { left: var(--margem); bottom: var(--margem); }
+.ed-anuncio.tema-primaria .ed-botao .ed-icone, .ed-anuncio.tema-secundaria .ed-botao .ed-icone { background: var(--fundo); border: 3px solid var(--texto); }
+/* no fundo escuro/claro o botão não pode ter a cor do fundo: vira destaque (ou secundária) */
+.ed-anuncio.tema-escuro .ed-botao, .ed-anuncio.tema-claro .ed-botao { background: var(--destaque); color: var(--texto-sobre-destaque); }
+.ed-anuncio.tema-escuro .ed-botao .ed-icone, .ed-anuncio.tema-claro .ed-botao .ed-icone { background: var(--fundo); }
+.ed-anuncio.tema-escuro.acento-secundaria .ed-botao { background: var(--secundaria); color: var(--texto); }
+.ed-anuncio.tema-escuro.acento-secundaria .ed-botao .ed-icone { background: var(--fundo); }

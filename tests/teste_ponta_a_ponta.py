@@ -162,6 +162,18 @@ def main():
         if not ok:
             falhas.append("linha editorial")
 
+        c5 = cli / "criativos" / "c5" / "anuncio"
+        c5.mkdir(parents=True)
+        (c5 / "roteiro.json").write_text(json.dumps({"brand_kit": "../../../brand-kit.json", "formato": "feed", "pecas": [
+            {"template": "anuncio", "campos": {"tema": "primaria", "rotulo": "Oferta", "titulo": "Seu domingo *começa aqui*",
+                                               "subtitulo": "Piscinas e café da fazenda.", "foto": "../../../referencias/cliente/post05.jpg"}}]},
+            ensure_ascii=False))
+        rodar("renderiza variante de anúncio 4:5", [PY, render, c5 / "roteiro.json"])
+        h_an = (c5 / "render" / "01-anuncio.html").read_text() if (c5 / "render" / "01-anuncio.html").exists() else ""
+        ok_an = "(11) 90000-0000" in h_an and "logo-primaria.svg" in h_an and "Arraste" not in h_an
+        print(("✓" if ok_an else "✗"), "anúncio com WhatsApp, logo do fundo e sem 'arraste'")
+        if not ok_an:
+            falhas.append("anúncio")
         c4 = cli / "criativos" / "c4"
         c4.mkdir(parents=True)
         (c4 / "roteiro.json").write_text(json.dumps({"brand_kit": "../../brand-kit.json", "pecas": [
@@ -224,7 +236,7 @@ def main():
             "graficos": [{"tipo": "manchete", "t": 0.5, "ate": 2.4, "texto": "Gancho *escrito*", "sfx": "pop"},
                          {"tipo": "tile", "icone": "relogio", "icone_texto": "8h", "x": 72, "y": 560, "t": 2.4, "ate": 3.6},
                          {"tipo": "cartela", "t": 3.6, "ate": 4.8, "rotulo": "Rótulo", "texto": "Cartela *cheia*",
-                          "icones": [["loja", "A"], ["check", "B"]]},
+                          "icones": [["loja", "A"], ["balanca", "B"]]},
                          {"tipo": "logo", "t": 4.8, "ate": 5.5}],
             "cta_duracao": 3, "cta": {"rotulo": "Contato", "titulo": "Fale no *WhatsApp.*", "botao_sub": "Resposta humana"}}
         (r2 / "roteiro-reedicao.json").write_text(json.dumps(roteiro_reed, ensure_ascii=False))

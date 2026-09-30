@@ -118,6 +118,8 @@ stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset
 <path d="M156 40a60 60 0 0 1 18 30M44 40a60 60 0 0 0-18 30" stroke="var(--sec)" stroke-width="7" fill="none" stroke-linecap="round"/>''',
         "lua": f'''<path d="M130 30a70 70 0 1 0 40 110A58 58 0 0 1 130 30z" fill="var(--papel)" {_S}/><path d="M60 40l5 13 13 5-13 5-5 13-5-13-13-5 13-5z" fill="var(--pri)"/>''',
         "pessoa": f'''<circle cx="100" cy="70" r="32" fill="var(--papel)" {_S}/><path d="M40 170c0-36 26-58 60-58s60 22 60 58z" fill="var(--sec)" {_S}/>''',
+        "balanca": f'''<path d="M100 30v130M60 160h80" {_S}/><path d="M36 58h128" {_S}/><circle cx="100" cy="42" r="10" fill="var(--pri)" {_S}/>
+<path d="M36 58l-22 52h44zM164 58l-22 52h44z" fill="none" {_S}/><path d="M12 110a24 14 0 0 0 48 0zM140 110a24 14 0 0 0 48 0z" fill="var(--sec)" {_S}/>''',
         "seta-cresce": f'''<path d="M30 160l50-50 30 30 60-70" fill="none" stroke="var(--pri)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M136 64h40v40" fill="none" stroke="var(--pri)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>''',
     }
@@ -128,7 +130,7 @@ stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset
 
 
 ICONES = ("loja", "predio-medio", "predio-grande", "torre", "tesoura", "secador", "chave", "chat-ia", "chip",
-          "faisca", "relogio", "check", "calendario", "sino", "lua", "pessoa", "seta-cresce")
+          "faisca", "relogio", "check", "calendario", "sino", "lua", "pessoa", "seta-cresce", "balanca")
 
 
 # ------------------------------------------------------------------ utilidades

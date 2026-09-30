@@ -43,6 +43,7 @@ assinatura e "Arraste →" na capa; ilustração do cliente num "palco"):
 | `ponto-ilustrado` | 1 ideia por peça: traço de acento, título, texto/itens | `titulo`, `texto`?, `itens`? (até 4), `foto`?, `palco`? (`circulo`) |
 | `checklist` | resumo para salvar, até 4 itens marcados | `titulo`, `itens` (`"Item — descrição"`), `foto`? |
 | `cta-card` | card de chamada final com botão de contato | `titulo`, `texto`?, `foto`?, `cta`? (padrão "Chama no WhatsApp") |
+| `anuncio` | peça única 4:5 para anúncio (Meta): título, apoio, ilustração e botão de contato | `titulo`, `subtitulo`?, `foto`?, `cta`?, `rotulo`? |
 
 Comuns à linha editorial: `tema` (`escuro` padrão, `claro`, `primaria`, `secundaria` —
 troca só o par fundo/texto entre as cores do kit), `acento` (`secundaria` para a
@@ -72,6 +73,9 @@ na arte). "Arraste →" sem número pode ficar. Os templates não recebem índic
 o renderizador recusa os campos `numero`/`contador`/`indice`/`total`/`progresso`, e o
 teste de ponta a ponta reprova template que volte a usar contagem. Decisão de André
 (Braturix, 29/09/2026), adotada para todos os clientes.
+
+Variante de anúncio: quando a peça vai virar anúncio, gere também um `anuncio` 4:5
+numa pasta `anuncio/` do criativo (roteiro próprio, 1 peça) — fica fora da fila de feed.
 
 ## Fluxo
 
