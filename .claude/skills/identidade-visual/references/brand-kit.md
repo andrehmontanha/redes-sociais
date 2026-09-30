@@ -50,8 +50,12 @@ claro quebra a grade mesmo com a tipografia certa.
 
 - `logo`: caminho do arquivo (PNG transparente ou SVG) enviado pelo cliente, e
   `logo_posicao`: `topo-esquerda`, `rodape-centro` etc. `null` se o feed não usa logo.
-- `logo_variantes` (opcional): `{"sobre_escuro": "...", "sobre_claro": "..."}` — a versão
-  usada automaticamente nos temas claros da linha editorial.
+- `logo_variantes` (opcional): `{"sobre_escuro", "sobre_claro", "sobre_primaria", "sobre_secundaria"}` —
+  a versão que entra sozinha em cada fundo (tema da linha editorial, cartelas de vídeo). PNG
+  transparente ou **SVG só com paths** (sem script, fonte externa ou imagem embutida). Escolha
+  olhando cada arquivo sobre o fundo: variante com traço na cor primária some no fundo primária.
+  Sem `sobre_primaria`, o renderizador usa `sobre_claro`; sem `sobre_secundaria`, `sobre_escuro`.
+- `logo_outras_variantes` (opcional): símbolo, monograma para capa de Reel, avatar — registro do que o cliente enviou.
 - `assinatura`: o @ ou o site no rodapé? Escreva o texto exato, ou `nenhuma`.
 - `recorrentes`: lista curta — "selo circular com o ano de fundação", "moldura fina de 12 px na cor primária".
   Nunca contador de peças (01/06), barra de progresso ou numeração de slide: regra do estúdio.

@@ -123,6 +123,17 @@ def main():
         k = json.loads(kit.read_text())
         k["cores"]["papeis"].update({"secundaria": "#d67841", "claro": "#fffaf2"})
         k["contato"] = {"whatsapp": "(11) 90000-0000"}
+        # logo em SVG (só paths), uma variante por fundo
+        logos = cli / "material-cliente" / "logo"
+        logos.mkdir(parents=True)
+        for nome, cor in (("escuro", "#ffffff"), ("claro", "#1c3d34"), ("primaria", "#f6efe4")):
+            (logos / f"logo-{nome}.svg").write_text(
+                f'<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100" viewBox="0 0 400 100">'
+                f'<rect x="0" y="20" width="60" height="60" rx="12" fill="{cor}"/><rect x="80" y="40" width="300" height="20" fill="{cor}"/></svg>')
+        k["elementos"]["logo"] = "material-cliente/logo/logo-escuro.svg"
+        k["elementos"]["logo_variantes"] = {"sobre_escuro": "material-cliente/logo/logo-escuro.svg",
+                                            "sobre_claro": "material-cliente/logo/logo-claro.svg",
+                                            "sobre_primaria": "material-cliente/logo/logo-primaria.svg"}
         kit.write_text(json.dumps(k, ensure_ascii=False, indent=2))
         c3 = cli / "criativos" / "c3"
         c3.mkdir(parents=True)
@@ -142,6 +153,12 @@ def main():
         ok = ("<em>reservar?</em>" in html_cta and "(11) 90000-0000" in html_cta
               and not re.search(r">\s*0?\d\s*/\s*0?\d\s*<", todos) and "ed-progresso" not in todos)
         print(("✓" if ok else "✗"), "ênfase e contato no card, sem contagem de peças")
+        h_check = (c3 / "render" / "03-checklist.html").read_text()
+        h_capa = (c3 / "render" / "01-capa-editorial.html").read_text()
+        ok_logo = "logo-claro.svg" in h_check and "logo-escuro.svg" in h_capa
+        print(("✓" if ok_logo else "✗"), "logo SVG com a variante certa por fundo")
+        if not ok_logo:
+            falhas.append("logo por fundo")
         if not ok:
             falhas.append("linha editorial")
 
@@ -213,8 +230,9 @@ def main():
         (r2 / "roteiro-reedicao.json").write_text(json.dumps(roteiro_reed, ensure_ascii=False))
         rodar("monta reedição de apresentador", [PY, reed, r2 / "roteiro-reedicao.json"])
         idx = (r2 / "video" / "index.html").read_text() if (r2 / "video" / "index.html").exists() else ""
-        ok = "(11) 90000-0000" in idx and 'data-media-start="0.500"' in idx and "tarja" in idx
-        print(("✓" if ok else "✗"), "reedição usa o WhatsApp do kit, o corte e a tarja")
+        ok = ("(11) 90000-0000" in idx and 'data-media-start="0.500"' in idx and "tarja" in idx
+              and any(p.suffix == ".svg" for p in (r2 / "video" / "assets").glob("m*")))
+        print(("✓" if ok else "✗"), "reedição usa o WhatsApp e o logo SVG do kit, o corte e a tarja")
         if not ok:
             falhas.append("reedição de apresentador")
         (r2 / "ruim.json").write_text(json.dumps({**roteiro_reed, "legendas": [[0.6, 1.8, "cena 01/06"]]}, ensure_ascii=False))

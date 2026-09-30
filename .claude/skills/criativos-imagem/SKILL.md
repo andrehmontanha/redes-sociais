@@ -48,8 +48,9 @@ Comuns à linha editorial: `tema` (`escuro` padrão, `claro`, `primaria`, `secun
 troca só o par fundo/texto entre as cores do kit), `acento` (`secundaria` para a
 série na cor secundária) e **ênfase com asteriscos** no título/texto:
 `"Quem procura encontra *você ou o concorrente?*"` pinta o trecho na cor de acento.
-O botão do `cta-card` lê o número de `contato.whatsapp` do kit; o logo troca para
-`elementos.logo_variantes.sobre_claro` nos temas claros. Ícone de conversa genérico:
+O botão do `cta-card` lê o número de `contato.whatsapp` do kit; o logo troca sozinho pela
+variante do fundo (`elementos.logo_variantes.sobre_escuro|sobre_claro|sobre_primaria|sobre_secundaria`,
+PNG transparente ou SVG só com paths). Ícone de conversa genérico:
 nada de logotipo de terceiros nas artes (anúncio da Meta recusa e a regra do estúdio também).
 
 `?` = opcional. Logo, assinatura e margem de segurança do story entram sozinhos a

@@ -18,7 +18,7 @@
 .formato-story .ed { --topo-conteudo: 400px; --base-conteudo: 380px; }
 
 /* cabeçalho */
-.ed-logo { position: absolute; top: 64px; left: var(--margem); height: 40px; width: auto; }
+.ed-logo { position: absolute; top: 60px; left: var(--margem); height: 48px; width: auto; }
 .formato-story .ed-logo { top: 250px; }
 .ed-rotulo { position: absolute; top: 160px; left: var(--margem); right: var(--margem);
   display: flex; align-items: center; gap: 18px; color: var(--acento);

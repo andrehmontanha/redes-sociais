@@ -170,8 +170,12 @@ def montar_html(peca, idx, total, kit, formato, base: Path, base_kit: Path):
             campos[chave] = valor.replace("*", "")
     tema = campos.get("tema", "escuro")
     variantes = elem.get("logo_variantes") or {}
-    if tema in ("claro", "primaria") and variantes.get("sobre_claro"):
-        campos["logo"] = url_arquivo(base_kit / variantes["sobre_claro"])
+    # variante do logo pelo fundo da peça (PNG ou SVG do cliente); recua para a mais próxima
+    ordem = {"escuro": ["sobre_escuro"], "claro": ["sobre_claro"],
+             "primaria": ["sobre_primaria", "sobre_claro"], "secundaria": ["sobre_secundaria", "sobre_escuro"]}
+    escolha = next((variantes[v] for v in ordem.get(tema, []) if variantes.get(v)), None)
+    if escolha:
+        campos["logo"] = url_arquivo(base_kit / escolha)
     if elem.get("logo"):
         campos.setdefault("logo", url_arquivo(base_kit / elem["logo"]))
     contato = kit.get("contato") or {}
