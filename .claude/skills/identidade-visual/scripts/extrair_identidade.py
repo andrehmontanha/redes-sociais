@@ -24,6 +24,7 @@ chutar aqui contamina todos os criativos que vêm depois.
 
 import argparse
 import json
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -246,6 +247,9 @@ def validar(arq: Path) -> int:
                              "abaixo de 3 — defina cores.papeis.texto_sobre_destaque")
         except (KeyError, ValueError):
             pass
+    for r in kit.get("elementos", {}).get("recorrentes", []) or []:
+        if re.search(r"contador|barra de progresso|\b\d{1,2}\s*/\s*\d{1,2}\b", str(r), re.I):
+            erros.append(f"elementos.recorrentes com contagem ('{r}') — regra do estúdio: nenhuma contagem nas peças")
     if not kit.get("confirmado_por"):
         erros.append("confirmado_por vazio — o brand kit só vale depois que um humano confirma")
     if len(kit.get("referencias_aprovadas", [])) < 3:

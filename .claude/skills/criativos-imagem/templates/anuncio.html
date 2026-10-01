@@ -1,0 +1,16 @@
+<!-- Anúncio estático único (4:5, Meta): rótulo, título com *ênfase*, texto de apoio,
+     ilustração do cliente e botão de contato com o WhatsApp do kit. Sem rodapé e sem
+     contagem. Texto essencial dentro da margem do kit (a revisão confere). -->
+<div class="quadro ed tema-{{tema}} {{#acento}}acento-{{acento}}{{/acento}} ed-anuncio">
+  {{#logo}}<img class="ed-logo" src="{{logo}}" alt="">{{/logo}}{{^logo}}<div class="ed-logo" style="font-family:var(--fonte-titulo);font-weight:var(--peso-titulo);font-size:34px;height:auto">{{assinatura}}</div>{{/logo}}
+  {{#rotulo}}<div class="ed-rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
+  <div class="ed-bloco">
+    <h1 class="ed-titulo ajustar" data-campo="titulo" data-min="56">{{{titulo_html}}}</h1>
+    {{#subtitulo}}<p class="ed-texto ajustar" data-campo="subtitulo" data-min="26">{{{subtitulo_html}}}</p>{{/subtitulo}}
+  </div>
+  {{#foto}}<div class="ed-palco {{#palco}}{{palco}}{{/palco}}{{^palco}}sem-painel{{/palco}}"><img src="{{foto}}" alt=""></div>{{/foto}}
+  <div class="ed-botao seguro" data-campo="cta">
+    <span class="ed-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--texto)"><path d="M4 5.5h16v10H10l-4.5 3.5v-3.5H4z"/><circle cx="9" cy="10.5" r=".6" fill="currentColor"/><circle cx="12" cy="10.5" r=".6" fill="currentColor"/><circle cx="15" cy="10.5" r=".6" fill="currentColor"/></svg></span>
+    <span><b>{{#cta}}{{cta}}{{/cta}}{{^cta}}Chama no WhatsApp{{/cta}}</b>{{#whatsapp}}<span class="ed-num">{{whatsapp}}</span>{{/whatsapp}}</span>
+  </div>
+</div>

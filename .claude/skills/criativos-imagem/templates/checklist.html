@@ -1,0 +1,14 @@
+<!-- Checklist para salvar: título, até 4 itens com caixa marcada; cada item é
+     "Título — descrição" (a descrição é opcional). Ilustração opcional no alto. -->
+<div class="quadro ed tema-{{tema}} {{#acento}}acento-{{acento}}{{/acento}} ed-check">
+  {{#logo}}<img class="ed-logo" src="{{logo}}" alt="">{{/logo}}{{^logo}}<div class="ed-logo" style="font-family:var(--fonte-titulo);font-weight:var(--peso-titulo);font-size:34px;height:auto">{{assinatura}}</div>{{/logo}}
+  {{#rotulo}}<div class="ed-rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
+  <h2 class="ed-titulo ajustar" data-campo="titulo" data-min="48">{{{titulo_html}}}</h2>
+  {{#foto}}<div class="ed-palco {{#palco}}{{palco}}{{/palco}}{{^palco}}sem-painel{{/palco}}"><img src="{{foto}}" alt=""></div>{{/foto}}
+  <ul class="ed-lista ajustar" data-campo="itens" data-min="22">
+    {{#itens_check}}<li><span class="ed-caixa"></span><div><div class="ed-item-t">{{t}}</div>{{#d}}<div class="ed-item-d">{{d}}</div>{{/d}}</div></li>{{/itens_check}}
+  </ul>
+  <div class="ed-rodape">
+    <span class="ed-assinatura">{{assinatura}}</span>
+  </div>
+</div>

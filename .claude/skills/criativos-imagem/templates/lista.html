@@ -1,15 +1,14 @@
-<!-- Peça de conteúdo de carrossel: título + itens numerados. Até 5 itens. -->
+<!-- Peça de conteúdo de carrossel: título + itens com marcador. Até 5 itens. -->
 <div class="quadro {{classe_alinhamento}}">
   <div class="area" style="justify-content:center">
     {{#rotulo}}<div class="rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
     <h2 class="titulo ajustar" data-campo="titulo" style="font-size:72px;max-height:26%">{{titulo}}</h2>
     <ol class="texto ajustar" data-campo="itens" data-min="26" style="list-style:none;display:flex;flex-direction:column;gap:26px;max-height:62%">
-      {{#itens}}<li style="display:flex;gap:24px;align-items:baseline"><span style="font-family:var(--fonte-titulo);font-weight:var(--peso-titulo);color:var(--primaria);min-width:1.4em">{{n}}</span><span>{{.}}</span></li>{{/itens}}
+      {{#itens}}<li style="display:flex;gap:24px;align-items:baseline"><span style="flex:none;width:.42em;height:.42em;border-radius:.1em;background:var(--primaria);transform:translateY(-.08em)"></span><span>{{.}}</span></li>{{/itens}}
     </ol>
   </div>
   {{#logo}}<img class="logo {{posicao_logo}}" src="{{logo}}" alt="">{{/logo}}
   <div class="rodape">
     <span class="assinatura">{{assinatura}}</span>
-    {{#carrossel}}<span class="contador">{{indice}}/{{total}}</span>{{/carrossel}}
   </div>
 </div>

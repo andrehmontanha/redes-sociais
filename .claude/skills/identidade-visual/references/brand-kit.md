@@ -50,8 +50,16 @@ claro quebra a grade mesmo com a tipografia certa.
 
 - `logo`: caminho do arquivo (PNG transparente ou SVG) enviado pelo cliente, e
   `logo_posicao`: `topo-esquerda`, `rodape-centro` etc. `null` se o feed não usa logo.
+- `logo_variantes` (opcional): `{"sobre_escuro", "sobre_claro", "sobre_primaria", "sobre_secundaria"}` —
+  a versão que entra sozinha em cada fundo (tema da linha editorial, cartelas de vídeo). PNG
+  transparente ou **SVG só com paths** (sem script, fonte externa ou imagem embutida). Escolha
+  olhando cada arquivo sobre o fundo: variante com traço na cor primária some no fundo primária.
+  Sem `sobre_primaria`, o renderizador usa `sobre_claro`; sem `sobre_secundaria`, `sobre_escuro`.
+- `logo_outras_variantes` (opcional): símbolo, monograma para capa de Reel, avatar — registro do que o cliente enviou.
 - `assinatura`: o @ ou o site no rodapé? Escreva o texto exato, ou `nenhuma`.
 - `recorrentes`: lista curta — "selo circular com o ano de fundação", "moldura fina de 12 px na cor primária".
+  Nunca contador de peças (01/06), barra de progresso ou numeração de slide: regra do estúdio.
+- `proibidos` (opcional): o que não se repete nas peças, com quem decidiu e quando.
 
 ## voz
 
@@ -75,3 +83,12 @@ aprovou como referência.
 | `legenda_na_tela` | `sempre`, `gancho` (só nos 3 s iniciais), `nunca` |
 | `estilo_movimento` | `sobrio` (fades, deslizes curtos), `energico` (cortes secos, zooms, textos que entram batendo) |
 | `sfx_familia` | `sutil` (cliques, pops leves), `impacto` (whoosh, hits), `nenhum` |
+
+## contato e diretrizes de anúncio (opcionais)
+
+- `contato.whatsapp`: número exibido no botão do template `cta-card` — só o que o cliente informou.
+- `diretrizes_anuncio.regras`: quando as peças viram anúncio (Meta), as regras que o cliente
+  passou (CTA, zonas seguras, nada de preço/prazo/resultado não informado, nada de afirmar
+  atributos pessoais do espectador, nada de marca de terceiros). A revisão confere cada peça contra elas.
+- `cores.papeis.secundaria` e `cores.papeis.claro` (opcionais) viram `--secundaria` e `--claro`
+  nos templates; `tipografia.rotulo` vira `--fonte-rotulo`/`--peso-rotulo`/`--espacamento-rotulo`.

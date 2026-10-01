@@ -122,6 +122,40 @@ Para a grade, gere uma capa com a skill `criativos-imagem` (template `foto-titul
 ou `texto-destaque`, formato `story`, 1080×1920 — a grade mostra o recorte central
 4:5). Sem capa própria, o publicador usa `thumb_offset` do quadro escolhido.
 
+## Reedição de vídeo com apresentador — ESTILO PADRÃO
+
+Quando o cliente tem vídeo de uma pessoa falando para a câmera, a edição padrão do
+estúdio é `scripts/reeditar_apresentador.py` (modelo aprovado por André/Braturix em
+29/09/2026 no Reel "IA é coisa de empresa grande?"). Ele mantém o vídeo em tela cheia e
+põe por cima, só com cores e fontes do kit:
+
+- manchete de gancho legível no quadro 0 e legenda sincronizada à fala numa tarja da
+  marca (que também cobre legenda antiga queimada no vídeo, se houver);
+- ícones vetoriais originais (biblioteca genérica do script: `--icones` lista) que
+  ilustram o que é dito — nunca logotipo de terceiros (Claude, ChatGPT, WhatsApp…);
+- punch-ins, risco sobre a manchete, cartela de tela cheia com a voz por baixo, logo;
+- cartela final de contato com o WhatsApp de `contato.whatsapp` do kit;
+- deixas de SFX só do catálogo e da família do kit.
+
+```bash
+python .claude/skills/criativos-video/scripts/reeditar_apresentador.py clientes/<h>/criativos/<id>/roteiro-reedicao.json
+cd clientes/<h>/criativos/<id>/video && npx --yes hyperframes@0.8.90 check && npx --yes hyperframes@0.8.90 render -o reel-mudo.mp4
+python .claude/skills/efeitos-sonoros/scripts/mixar_sfx.py reel-mudo.mp4 deixas.json --saida reel.mp4
+python .claude/skills/criativos-video/scripts/validar_reel.py reel.mp4
+```
+
+Formato do roteiro, como tirar os tempos da fala e o checklist de revisão:
+`references/reedicao-apresentador.md`. Legenda precisa de transcrição real (ou da
+legenda do próprio vídeo): sem ela, textos na tela são manchetes, não legenda — diga isso.
+
+## Regra do estúdio: nenhuma contagem
+
+Nada que se refira a contagem de peças, em imagem ou vídeo, de qualquer cliente: sem
+contador `01/06`, sem barra de progresso, sem número de peça/slide/cena (nem "parte 2"
+na arte). "Arraste →" sem número pode ficar. O `reeditar_apresentador.py` recusa texto na tela com cara de
+contagem (`01/06`) e nenhum Reel mostra número de cena. Decisão de André
+(Braturix, 29/09/2026), adotada para todos os clientes.
+
 ## Story em vídeo
 
 Mesmo fluxo, com cenas curtas (até 15 s no total por story) e

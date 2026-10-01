@@ -27,15 +27,35 @@ de cliente é trocar o kit.
 | Template | Para quê | Campos |
 |---|---|---|
 | `capa-carrossel` | primeira peça de carrossel: promessa + convite a arrastar | `titulo`, `rotulo`?, `subtitulo`?, `foto`?, `arraste`? |
-| `lista` | peça de conteúdo: até 5 itens numerados | `titulo`, `itens` (lista), `rotulo`? |
+| `lista` | peça de conteúdo: até 5 itens com marcador | `titulo`, `itens` (lista), `rotulo`? |
 | `texto-destaque` | frase de impacto, dado, pergunta — fundo sólido | `titulo`, `rotulo`?, `subtitulo`? |
 | `foto-titulo` | foto do cliente em tela cheia com título | `foto`, `titulo`, `rotulo`?, `subtitulo`? |
 | `citacao` | prova social — depoimento **real** | `citacao`, `autor`, `contexto`?, `foto`? |
 | `oferta` | produto/serviço, preço, CTA | `titulo`, `preco`?, `cta`?, `rotulo`?, `foto`? |
 | `prova-brand-kit` | prova visual do kit para o humano confirmar | — (lê do kit) |
 
-`?` = opcional. Logo, assinatura, contador de carrossel e margem de segurança do
-story entram sozinhos a partir do kit.
+**Linha editorial** (grid com cabeçalho de logo + rótulo com fio, rodapé com fio,
+assinatura e "Arraste →" na capa; ilustração do cliente num "palco"):
+
+| Template | Para quê | Campos |
+|---|---|---|
+| `capa-editorial` | capa com título de impacto e ilustração | `titulo`, `rotulo`?, `subtitulo`?, `foto`?, `layout` (`coluna`\|`topo`), `palco`? |
+| `ponto-ilustrado` | 1 ideia por peça: traço de acento, título, texto/itens | `titulo`, `texto`?, `itens`? (até 4), `foto`?, `palco`? (`circulo`) |
+| `checklist` | resumo para salvar, até 4 itens marcados | `titulo`, `itens` (`"Item — descrição"`), `foto`? |
+| `cta-card` | card de chamada final com botão de contato | `titulo`, `texto`?, `foto`?, `cta`? (padrão "Chama no WhatsApp") |
+| `anuncio` | peça única 4:5 para anúncio (Meta): título, apoio, ilustração e botão de contato | `titulo`, `subtitulo`?, `foto`?, `cta`?, `rotulo`? |
+
+Comuns à linha editorial: `tema` (`escuro` padrão, `claro`, `primaria`, `secundaria` —
+troca só o par fundo/texto entre as cores do kit), `acento` (`secundaria` para a
+série na cor secundária) e **ênfase com asteriscos** no título/texto:
+`"Quem procura encontra *você ou o concorrente?*"` pinta o trecho na cor de acento.
+O botão do `cta-card` lê o número de `contato.whatsapp` do kit; o logo troca sozinho pela
+variante do fundo (`elementos.logo_variantes.sobre_escuro|sobre_claro|sobre_primaria|sobre_secundaria`,
+PNG transparente ou SVG só com paths). Ícone de conversa genérico:
+nada de logotipo de terceiros nas artes (anúncio da Meta recusa e a regra do estúdio também).
+
+`?` = opcional. Logo, assinatura e margem de segurança do story entram sozinhos a
+partir do kit. Não há contador de carrossel (ver a regra abaixo).
 
 Densidade de texto segue `composicao.densidade_texto`: `minima` → títulos de até 6
 palavras e nada de `subtitulo`; `media` → até 20 palavras por peça; `alta` → carrossel
@@ -44,6 +64,18 @@ educativo com `lista`.
 Precisa de um layout que não existe? Crie `templates/<nome>.html` seguindo os
 existentes: só variáveis CSS do kit, texto em elementos `.ajustar` (encolhe até caber)
 ou `.seguro` (conferido contra a margem), e `data-campo` para o relatório apontar o campo.
+
+## Regra do estúdio: nenhuma contagem
+
+Nada que se refira a contagem de peças, em imagem ou vídeo, de qualquer cliente: sem
+contador `01/06`, sem barra de progresso, sem número de peça/slide/cena (nem "parte 2"
+na arte). "Arraste →" sem número pode ficar. Os templates não recebem índice nem total,
+o renderizador recusa os campos `numero`/`contador`/`indice`/`total`/`progresso`, e o
+teste de ponta a ponta reprova template que volte a usar contagem. Decisão de André
+(Braturix, 29/09/2026), adotada para todos os clientes.
+
+Variante de anúncio: quando a peça vai virar anúncio, gere também um `anuncio` 4:5
+numa pasta `anuncio/` do criativo (roteiro próprio, 1 peça) — fica fora da fila de feed.
 
 ## Fluxo
 

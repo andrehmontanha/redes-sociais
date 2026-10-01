@@ -114,7 +114,12 @@ def css_marca(kit, largura, altura, base_kit: Path):
     cores = kit["cores"]["papeis"]
     tip, comp = kit["tipografia"], kit["composicao"]
     faces = []
-    for papel in ("titulo", "texto"):
+    papeis_fonte = ["titulo", "texto"]
+    rot = tip.get("rotulo") or {}
+    if rot.get("familia") and (rot["familia"], rot.get("peso")) not in {
+            (tip[p]["familia"], tip[p].get("peso")) for p in ("titulo", "texto")}:
+        papeis_fonte.append("rotulo")
+    for papel in papeis_fonte:
         f = tip[papel]
         if f.get("google_fonts", True):
             faces.append(google_font_local(f["familia"], f.get("peso", 400)))
@@ -133,6 +138,9 @@ def css_marca(kit, largura, altura, base_kit: Path):
       --fonte-titulo: '{tip['titulo']['familia']}', serif; --peso-titulo: {tip['titulo'].get('peso', 700)};
       --caixa-titulo: {caixa};
       --fonte-texto: '{tip['texto']['familia']}', sans-serif; --peso-texto: {tip['texto'].get('peso', 400)};
+      --secundaria: {cores.get('secundaria', cores['primaria'])}; --claro: {cores.get('claro', cores['fundo'])};
+      --fonte-rotulo: '{rot.get('familia', tip['texto']['familia'])}', sans-serif; --peso-rotulo: {rot.get('peso', 600)};
+      --espacamento-rotulo: {rot.get('espacamento', '0.12em')};
       --margem: {comp.get('margem_px', 72)}px; --raio: {comp.get('raio_borda_px', 0)}px;
       --alinhamento: {'center' if comp.get('alinhamento') == 'centro' else 'left'};
     }}"""
@@ -146,21 +154,45 @@ def montar_html(peca, idx, total, kit, formato, base: Path, base_kit: Path):
         disponiveis = ", ".join(sorted(p.stem for p in TEMPLATES.glob("*.html")))
         sys.exit(f"template inexistente: {peca['template']} (disponíveis: {disponiveis})")
     campos = dict(peca.get("campos", {}))
+    proibidos = {"numero", "contador", "indice", "total", "progresso"} & set(campos)
+    if proibidos:
+        sys.exit(f"campo(s) {', '.join(sorted(proibidos))}: o estúdio não usa contagem de peça/slide/cena")
     for chave in [k for k in campos if k == "foto" or k.startswith("foto_")]:
         campos[chave] = resolver_foto(campos[chave], base, base_kit)
     elem, comp = kit["elementos"], kit["composicao"]
-    if elem.get("logo"):
-        campos.setdefault("logo", url_arquivo(base_kit / elem["logo"]))
     assinatura = elem.get("assinatura")
     if assinatura and assinatura != "nenhuma":
         campos.setdefault("assinatura", assinatura)
+    for chave, valor in list(campos.items()):
+        # *trecho* vira <em> (ênfase na cor de acento do template) na versão _html do campo
+        if isinstance(valor, str) and not chave.startswith("foto"):
+            campos[f"{chave}_html"] = re.sub(r"\*(.+?)\*", r"<em>\1</em>", html.escape(valor))
+            campos[chave] = valor.replace("*", "")
+    tema = campos.get("tema", "escuro")
+    variantes = elem.get("logo_variantes") or {}
+    # variante do logo pelo fundo da peça (PNG ou SVG do cliente); recua para a mais próxima
+    ordem = {"escuro": ["sobre_escuro"], "claro": ["sobre_claro"],
+             "primaria": ["sobre_primaria", "sobre_claro"], "secundaria": ["sobre_secundaria", "sobre_escuro"]}
+    escolha = next((variantes[v] for v in ordem.get(tema, []) if variantes.get(v)), None)
+    if escolha:
+        campos["logo"] = url_arquivo(base_kit / escolha)
+    if elem.get("logo"):
+        campos.setdefault("logo", url_arquivo(base_kit / elem["logo"]))
+    contato = kit.get("contato") or {}
+    if contato.get("whatsapp"):
+        campos.setdefault("whatsapp", contato["whatsapp"])
     campos.update({
-        "indice": idx, "total": total, "carrossel": total > 1 and formato != "story",
+        # REGRA DO ESTÚDIO: nada de contagem (01/06, barra de progresso, número de peça).
+        # Índice e total não chegam aos templates de propósito.
+        "tema": tema, "carrossel": total > 1 and formato != "story", "primeira": idx == 1,
         "posicao_logo": elem.get("logo_posicao", "topo-esquerda"),
         "classe_alinhamento": "centro" if comp.get("alinhamento") == "centro" else "",
         f"tratamento_{comp.get('texto_sobre_foto', 'degrade')}": True,
         "formato": formato,
     })
+    if isinstance(campos.get("itens"), list) and campos["itens"]:
+        campos["tem_itens"] = True
+        campos["itens_check"] = [dict(zip(("t", "d"), (x.split(" — ", 1) + [""])[:2])) for x in campos["itens"]]
     if formato == "story":
         campos["story"] = True
     if peca["template"] == "prova-brand-kit":
@@ -172,7 +204,7 @@ def montar_html(peca, idx, total, kit, formato, base: Path, base_kit: Path):
         campos.setdefault("titulo", "@" + kit["handle"])
     corpo = render_template(arq.read_text(encoding="utf-8"), campos)
     link, variaveis = css_marca(kit, largura, altura, base_kit)
-    base_css = (TEMPLATES / "_base.css").read_text(encoding="utf-8")
+    base_css = "\n".join(p.read_text(encoding="utf-8") for p in sorted(TEMPLATES.glob("_*.css")))
     return f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">{link}
 <style>{variaveis}\n{base_css}</style></head>
 <body class="formato-{formato}">{corpo}</body></html>"""

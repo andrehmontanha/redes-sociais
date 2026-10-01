@@ -1,0 +1,19 @@
+<!-- Última peça: card na cor de acento com a pergunta, o que a marca faz e o botão
+     de contato (WhatsApp do kit, em contato.whatsapp). Ícone de conversa genérico,
+     sem logotipo de terceiros. -->
+<div class="quadro ed tema-{{tema}} {{#acento}}acento-{{acento}}{{/acento}} ed-cta">
+  {{#logo}}<img class="ed-logo" src="{{logo}}" alt="">{{/logo}}{{^logo}}<div class="ed-logo" style="font-family:var(--fonte-titulo);font-weight:var(--peso-titulo);font-size:34px;height:auto">{{assinatura}}</div>{{/logo}}
+  {{#rotulo}}<div class="ed-rotulo seguro" data-campo="rotulo">{{rotulo}}</div>{{/rotulo}}
+  <div class="ed-card">
+    <h2 class="ed-titulo ajustar" data-campo="titulo" data-min="48">{{{titulo_html}}}</h2>
+    {{#texto}}<p class="ed-texto ajustar" data-campo="texto" data-min="26">{{{texto_html}}}</p>{{/texto}}
+    {{#foto}}<div class="ed-palco sem-painel"><img src="{{foto}}" alt=""></div>{{/foto}}
+    <div class="ed-botao seguro" data-campo="cta">
+      <span class="ed-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--texto)"><path d="M4 5.5h16v10H10l-4.5 3.5v-3.5H4z"/><circle cx="9" cy="10.5" r=".6" fill="currentColor"/><circle cx="12" cy="10.5" r=".6" fill="currentColor"/><circle cx="15" cy="10.5" r=".6" fill="currentColor"/></svg></span>
+      <span><b>{{#cta}}{{cta}}{{/cta}}{{^cta}}Chama no WhatsApp{{/cta}}</b>{{#whatsapp}}<span class="ed-num">{{whatsapp}}</span>{{/whatsapp}}</span>
+    </div>
+  </div>
+  <div class="ed-rodape">
+    <span class="ed-assinatura">{{assinatura}}</span>
+  </div>
+</div>

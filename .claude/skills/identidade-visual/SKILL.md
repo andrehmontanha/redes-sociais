@@ -65,7 +65,10 @@ em qual post viu. Guia campo a campo em `references/brand-kit.md`. O essencial:
   marca, e os templates precisam respeitá-la.
 - **composição** — alinhamento, margem, se o texto vai sobre foto ou em faixa,
   densidade de texto (palavras por arte).
-- **elementos** — logo e onde ele aparece, selos, molduras, grafismos.
+- **elementos** — logo e onde ele aparece, selos, molduras, grafismos. **Contador de
+  peças (01/06), barra de progresso ou numeração de slide não entram em `recorrentes`**
+  mesmo que o feed use: é regra do estúdio (nenhuma contagem nas peças). Registre em
+  `elementos.proibidos` o que o cliente não quer repetir; a validação recusa contagem em `recorrentes`.
 - **voz** — leia 10 legendas: pessoa (eu/nós/você), emojis, tamanho, CTA, hashtags fixas.
 - **vídeo** — dos teardowns da análise: ritmo de corte, legenda na tela, estilo de movimento.
 
