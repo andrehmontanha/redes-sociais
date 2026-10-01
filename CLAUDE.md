@@ -16,7 +16,7 @@ que conduz o ciclo e chama as skills na ordem.
 | `criativos-video` | Reels com HyperFrames (motion) a partir de roteiro de cenas |
 | `efeitos-sonoros` | biblioteca de SFX/trilhas livres de direitos, catálogo com licença, mixagem −14 LUFS |
 | `avatares` | avatares HeyGen de pessoas do perfil, com termo + consentimento gravado, aviso de IA e revogação |
-| `publicar-instagram` | fila, prévia, aprovação com trava por hash, publicação e métricas pela Graph API |
+| `publicar-instagram` | fila, prévia, aprovação com trava por hash; `enviar_webapp.py` entrega ao webapp, que aprova, agenda e publica |
 
 O agente `dossie-social` é o modo dossiê da análise (acervo completo).
 As skills `hyperframes*` vêm do plugin HyperFrames da conta, não deste repositório.
@@ -51,9 +51,14 @@ Rode o teste de ponta a ponta depois de mexer em qualquer script ou template.
 
 ## Webapp (`webapp/`, Next.js 16 → Vercel)
 
-Painel para conectar o Instagram (login oficial ou token de teste do modo dev) e ler
-métricas internas. Tokens ficam criptografados em cookie httpOnly; tudo exige
-`ESTUDIO_SENHA`, menos `/entrar` e a demonstração. Nunca implemente login por
+Painel para conectar o Instagram (login oficial ou token de teste do modo dev), ler
+métricas internas e **operar a fila de publicação**: o estúdio é o motor (gera e envia
+com `enviar_webapp.py`); o webapp mostra a prévia, registra a aprovação humana com a
+mesma trava por impressão digital do `fila.py`, e o agendador (`/api/cron/publicar`,
+disparado pelo GitHub Actions a cada 10 min) publica no horário. Fila e contas ficam
+no Upstash Redis (tokens selados com AES-256-GCM), mídia no Vercel Blob. Tudo exige
+`ESTUDIO_SENHA`, menos `/entrar`, a demonstração e as rotas de máquina (`/api/estudio/*`
+com `ESTUDIO_API_CHAVE`, `/api/cron/*` com `CRON_SECRET`). Nunca implemente login por
 usuário e senha do Instagram. Next 16: `proxy.ts` (não `middleware.ts`), `params`
 e `cookies()` assíncronos.
 

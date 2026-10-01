@@ -16,6 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Link href="/" className="marca">Estúdio <span>Social</span></Link>
           <nav className="nav" aria-label="Principal">
             <Link href="/">Contas</Link>
+            <Link href="/fila">Fila</Link>
             <Link href="/modo-dev">Modo dev</Link>
             <Link href="/demo">Demonstração</Link>
             {protegido() && <Link href="/sair" prefetch={false}>Sair</Link>}

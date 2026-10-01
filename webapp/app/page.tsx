@@ -68,7 +68,7 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<R
       </section>
 
       <section className="cartao" aria-labelledby="conectadas">
-        <h2 id="conectadas">Conectadas neste navegador</h2>
+        <h2 id="conectadas">Contas conectadas</h2>
         {contas.length === 0 ? (
           <p className="sub">Nenhuma conta conectada ainda.</p>
         ) : (
@@ -98,8 +98,8 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<R
           </div>
         )}
         <p className="sub" style={{ fontSize: "0.85rem" }}>
-          Os tokens ficam criptografados num cookie deste navegador (AES-256-GCM, inacessível ao JavaScript da
-          página). Nenhum servidor de terceiros guarda as contas.
+          Os tokens ficam criptografados (AES-256-GCM) num cookie deste navegador, inacessível ao JavaScript da
+          página, e — com a fila de publicação ativa — também no servidor, selados, para o agendador publicar.
         </p>
       </section>
     </main>

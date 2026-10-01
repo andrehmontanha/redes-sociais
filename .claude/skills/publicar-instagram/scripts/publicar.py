@@ -150,6 +150,9 @@ def publicar_item(item: Path, agora_mesmo=False, simular=False):
     if post["status"] == "publicado":
         print(f"já publicado: {post.get('resultado', {}).get('permalink')}")
         return True
+    if post.get("webapp"):
+        print(f"✗ {item.name}: enviado ao webapp ({post['webapp']['url']}) — quem publica é o webapp")
+        return False
     if post["status"] != "aprovado" or not post.get("aprovacao"):
         print(f"✗ {item.name}: status '{post['status']}' — só se publica item aprovado por um humano")
         return False

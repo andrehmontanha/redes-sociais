@@ -1,0 +1,31 @@
+# Agendador da fila de publicação do webapp. O cron da Vercel no plano Hobby roda
+# só uma vez por dia; este dispara o webapp a cada 10 minutos para publicar o que
+# já foi aprovado e chegou no horário. O webapp só publica item aprovado por uma
+# pessoa e com a trava (impressão digital) intacta.
+#
+# Configurar em Settings → Secrets and variables → Actions:
+#   secret   CRON_SECRET  — o mesmo valor da variável CRON_SECRET na Vercel
+#   variable ESTUDIO_URL  — opcional; padrão https://redes-sociais-webapp.vercel.app
+name: Agendador de publicação
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: agendador
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Disparar o agendador do webapp
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          ESTUDIO_URL: ${{ vars.ESTUDIO_URL || 'https://redes-sociais-webapp.vercel.app' }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then echo "::error::defina o secret CRON_SECRET"; exit 1; fi
+          curl -fsS --max-time 90 -H "Authorization: Bearer $CRON_SECRET" "$ESTUDIO_URL/api/cron/publicar"

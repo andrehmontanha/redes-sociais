@@ -23,6 +23,41 @@ Três formas de entrar:
    - `IG_APP_ID`, `IG_APP_SECRET` — quando o app da Meta existir
 5. Deploy. Sem `ESTUDIO_SENHA`/`SESSAO_SEGREDO` o app sobe **só com a demonstração**.
 
+## Fila de publicação (o webapp publica; o estúdio é o motor)
+
+O estúdio em Python gera os criativos e envia para cá
+(`.claude/skills/publicar-instagram/scripts/enviar_webapp.py`). Aqui a equipe aprova
+em **/fila** vendo a prévia, e o agendador publica no horário. A trava é a mesma do
+estúdio: a aprovação grava a impressão digital (sha256 da mídia + legenda + tipo +
+horário, mesmo algoritmo do `fila.py`), e a publicação recalcula sobre os bytes no
+Blob. Mudou qualquer coisa, precisa de novo “ok”.
+
+Configuração, uma vez:
+
+1. **Storage** no painel do projeto na Vercel:
+   - **Create → Blob**, acesso **Public** (o Instagram baixa a mídia de lá, sem credencial;
+     os nomes são aleatórios). Entra `BLOB_READ_WRITE_TOKEN`.
+   - **Create → Upstash for Redis** pelo Marketplace (plano grátis serve). Entram
+     `KV_REST_API_URL` e `KV_REST_API_TOKEN`.
+   Marque Production (e Preview, se quiser testar em preview).
+2. **Environment Variables**:
+   - `ESTUDIO_API_CHAVE` — `openssl rand -base64 36`. O estúdio usa a mesma no `.env`.
+   - `CRON_SECRET` — `openssl rand -base64 24`.
+3. **Redeploy** de produção.
+4. **Conecte as contas pelo webapp** (“Entrar com Instagram”): com o armazenamento
+   ativo, o token fica no servidor (selado com AES-256-GCM) e o agendador publica sem
+   navegador aberto. Conta conectada antes disso (só no cookie) precisa entrar de novo.
+5. **Agendador** — o cron da Vercel no plano Hobby roda uma vez por dia (`vercel.json`,
+   reforço às 12:00 de Brasília). Quem acerta o horário é o GitHub Actions
+   (`.github/workflows/agendador.yml`, a cada 10 min — o GitHub pode atrasar alguns
+   minutos em horário de pico). No GitHub: **Settings → Secrets and variables →
+   Actions** → secret `CRON_SECRET` (o mesmo da Vercel). O workflow só roda a partir
+   do branch padrão.
+
+Estados: aguardando aprovação → aprovado → publicando → publicado (ou rejeitado/erro).
+Erro mostra a causa e o botão “Tentar de novo”, que mantém a aprovação se nada mudou.
+Post com avatar digital não entra por aqui: a checagem de consentimento é do estúdio.
+
 ## App da Meta
 
 1. developers.facebook.com → **Criar app** → caso de uso de API do Instagram com
@@ -39,10 +74,14 @@ Três formas de entrar:
 ## Segurança
 
 - Tokens do Instagram ficam **criptografados (AES-256-GCM)** num cookie `httpOnly` do
-  navegador que conectou — o JavaScript da página não lê, e nenhum banco guarda.
-  Consequência: a conta conectada aparece só nesse navegador. Um banco (Supabase) para a
-  equipe inteira compartilhar contas é o próximo passo.
-- Tudo exige a senha do estúdio, menos `/entrar` e a demonstração.
+  navegador que conectou — o JavaScript da página não lê. Com o armazenamento da fila
+  ativo, ficam também no Redis, selados com a mesma criptografia, para o agendador
+  publicar e a equipe inteira ver as mesmas contas. O agendador renova o token antes
+  de vencer.
+- Tudo exige a senha do estúdio, menos `/entrar`, a demonstração e as rotas de máquina:
+  `/api/estudio/*` (chave `ESTUDIO_API_CHAVE`) e `/api/cron/*` (`CRON_SECRET`).
+- A mídia enviada pelo estúdio fica no Blob com nome aleatório, sem sobrescrita. Vídeo
+  é apagado depois de publicado.
 - O login é o **oficial do Instagram**: o app nunca vê nem pede senha de Instagram.
   Não há — nem haverá — login por usuário e senha do Instagram dentro do app: isso viola
   os termos da Meta, bloqueia contas e expõe a senha do cliente.
