@@ -117,8 +117,12 @@ da skill, e o Reel passou em `validar_reel.py`.
 
 ## Fase 5 — Aprovação
 
-Skill `publicar-instagram`: `fila.py criar` → `fila.py previa` → `SendUserFile`
-com a prévia → pergunte. Agrupe a semana numa rodada quando fizer sentido, cada
+Skill `publicar-instagram`. Padrão: `fila.py criar` → `enviar_webapp.py enviar` →
+mande o link da peça no webapp (`/fila/<id>`): a equipe aprova lá, com nome. Se o
+usuário preferir aprovar no chat: `fila.py previa` → `SendUserFile` com a prévia →
+pergunte, e só depois do "ok" com nome rode `fila.py aprovar` e então `enviar_webapp.py`
+(a aprovação vai junto, conferida pela impressão digital). Post com avatar fica no
+fluxo local abaixo. Agrupe a semana numa rodada quando fizer sentido, cada
 item identificado pelo nome da pasta.
 
 - Aprovado com nome → `fila.py aprovar --por "<nome>" --mensagem "<resposta>"`.
@@ -129,7 +133,10 @@ item identificado pelo nome da pasta.
 
 ## Fase 6 — Publicação e métricas
 
-- Ensaio: `publicar.py --simular item <item>`.
+- Item enviado ao webapp: quem publica é o agendador do webapp, no horário. Acompanhe
+  com `enviar_webapp.py status --cliente <handle>` e informe o permalink quando sair.
+  Erro de publicação aparece lá, com o botão "Tentar de novo".
+- Fluxo local (avatar ou sem webapp) — ensaio: `publicar.py --simular item <item>`.
 - Imediato: `publicar.py item <item> --agora`. Agendado: fica na fila; a rotina
   `publicar.py vencidos` publica na hora. Se a rotina não existir, ofereça criá-la
   (de hora em hora) e só crie com o "sim" do usuário.

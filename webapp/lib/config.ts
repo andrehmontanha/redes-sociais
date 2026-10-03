@@ -7,6 +7,13 @@ export const config = {
   igAppId: process.env.IG_APP_ID ?? "",
   igAppSecret: process.env.IG_APP_SECRET ?? "",
   graphVersao: process.env.IG_GRAPH_VERSION ?? "v23.0",
+  // chave do motor (estúdio em Python) para enviar criativos à fila
+  apiChave: process.env.ESTUDIO_API_CHAVE ?? "",
+  // chave do agendador (cron da Vercel e GitHub Actions)
+  cronSegredo: process.env.CRON_SECRET ?? "",
+  redisUrl: process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL ?? "",
+  redisToken: process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN ?? "",
+  blobToken: process.env.BLOB_READ_WRITE_TOKEN ?? "",
 };
 
 /** URL pública do app, usada no redirect do OAuth. APP_URL vence; na Vercel cai
@@ -25,3 +32,9 @@ export const redirectOAuth = (origem?: string) => `${urlDoApp(origem)}/api/insta
  *  apenas a demonstração — nunca um painel aberto com contas de clientes. */
 export const protegido = () => config.senha.length >= 8 && config.segredo.length >= 32;
 export const oauthDisponivel = () => protegido() && !!config.igAppId && !!config.igAppSecret;
+
+/** Fila e contas no servidor: Redis (Upstash, pelo Marketplace da Vercel) para os
+ *  dados e Vercel Blob para a mídia. Sem os dois, o app segue só com os cookies. */
+export const armazenamento = () => protegido() && !!config.redisUrl && !!config.redisToken && !!config.blobToken;
+export const motorConfigurado = () => armazenamento() && config.apiChave.length >= 32;
+export const agendadorConfigurado = () => armazenamento() && config.cronSegredo.length >= 16;

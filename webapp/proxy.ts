@@ -7,10 +7,14 @@ import { COOKIE_SESSAO, sessaoValida } from "./lib/sessao";
 // configurada, só a demonstração funciona: nada de contas reais num app aberto.
 
 const PUBLICO = ["/entrar", "/demo", "/conta/demo.resort", "/api/conta/demo.resort/bruto"];
+// Rotas de máquina: o motor e o agendador não têm cookie — cada rota confere a
+// própria chave (`Authorization: Bearer`) e recusa sem ela.
+const CHAVE_PROPRIA = ["/api/estudio", "/api/cron"];
 
 export function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   if (PUBLICO.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return NextResponse.next();
+  if (CHAVE_PROPRIA.some((p) => pathname.startsWith(`${p}/`))) return NextResponse.next();
 
   if (!protegido()) {
     if (pathname === "/") return NextResponse.next();

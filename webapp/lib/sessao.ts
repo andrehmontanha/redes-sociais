@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
-import { config, protegido } from "./config";
+import { contaDoServidor, contasDoServidor, guardarContaNoServidor } from "./armazenamento";
+import { armazenamento, config, protegido } from "./config";
 import { abrir, selar } from "./cripto";
 
 export const COOKIE_SESSAO = "estudio_sessao";
@@ -40,10 +41,20 @@ export async function encerrarSessao() {
   c.delete(COOKIE_SESSAO);
 }
 
-export async function lerContas(): Promise<Conta[]> {
+async function contasDoCookie(): Promise<Conta[]> {
   if (!protegido()) return [];
   const c = await cookies();
   return abrir<Conta[]>(c.get(COOKIE_CONTAS)?.value, config.segredo, "contas") ?? [];
+}
+
+/** Contas deste navegador somadas às do servidor (com armazenamento configurado,
+ *  toda a equipe vê as mesmas contas e o agendador publica sem navegador aberto). */
+export async function lerContas(): Promise<Conta[]> {
+  const doCookie = await contasDoCookie();
+  if (!armazenamento()) return doCookie;
+  const doServidor = await contasDoServidor();
+  const ids = new Set(doServidor.map((c) => c.id));
+  return [...doServidor, ...doCookie.filter((c) => !ids.has(c.id))];
 }
 
 export async function salvarContas(contas: Conta[]) {
@@ -56,12 +67,27 @@ export async function salvarContas(contas: Conta[]) {
 }
 
 export async function guardarConta(nova: Conta) {
-  const contas = (await lerContas()).filter((c) => c.id !== nova.id);
+  const contas = (await contasDoCookie()).filter((c) => c.id !== nova.id);
   await salvarContas([...contas, nova]);
+  if (armazenamento()) await guardarContaNoServidor(nova);
+}
+
+/** Tira a conta só do cookie deste navegador (a do servidor sai pelo `removerContaDoServidor`). */
+export async function esquecerNoNavegador(usuario: string) {
+  await salvarContas((await contasDoCookie()).filter((c) => c.usuario.toLowerCase() !== usuario.toLowerCase()));
 }
 
 export async function contaPorUsuario(usuario: string): Promise<Conta | undefined> {
-  return (await lerContas()).find((c) => c.usuario.toLowerCase() === usuario.toLowerCase());
+  if (armazenamento()) {
+    const doServidor = await contaDoServidor(usuario);
+    if (doServidor) return doServidor;
+  }
+  return (await contasDoCookie()).find((c) => c.usuario.toLowerCase() === usuario.toLowerCase());
 }
 
 export const opcoesCookie = baseCookie;
+
+/** Confere a sessão de novo dentro de uma ação de servidor (além do proxy). */
+export async function exigirSessao() {
+  if (!sessaoValida((await cookies()).get(COOKIE_SESSAO)?.value)) throw new Error("sessão expirada — entre de novo");
+}

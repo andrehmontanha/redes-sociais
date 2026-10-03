@@ -167,6 +167,18 @@ def main():
         post["legenda"] += " (editada depois)"
         pj.write_text(json.dumps(post, ensure_ascii=False))
         rodar("recusa item alterado depois da aprovação", [PY, pub, "--simular", "item", item, "--agora"], espera=1, env=env)
+        env_web = {**env, "ESTUDIO_API_CHAVE": "x" * 32, "ESTUDIO_WEBAPP_URL": "https://exemplo.invalid"}
+        rodar("webapp: não envia item alterado depois da aprovação", [PY, SK / "publicar-instagram" / "scripts" / "enviar_webapp.py",
+                                                                      "enviar", item], espera=1, env=env_web)
+        item2 = rodar("cria item para o webapp", [PY, fila, "criar", "--cliente", "demo", "--tipo", "feed",
+                                                  "--midias", jpgs[0], "--legenda", "Teste webapp"], env=env)
+        rodar("gera prévia do item do webapp", [PY, fila, "previa", item2], env=env)
+        rodar("aprova item do webapp", [PY, fila, "aprovar", item2, "--por", "Teste"], env=env)
+        pj2 = Path(item2) / "post.json"
+        post2 = json.loads(pj2.read_text())
+        post2["webapp"] = {"id": "demo--x", "enviado_em": "2026-10-01T00:00:00", "url": "https://exemplo.invalid/fila/demo--x"}
+        pj2.write_text(json.dumps(post2, ensure_ascii=False))
+        rodar("publicar.py recusa item entregue ao webapp", [PY, pub, "--simular", "item", item2, "--agora"], espera=1, env=env)
         rodar("recusa legenda com 31 hashtags", [PY, fila, "criar", "--cliente", "demo", "--tipo", "feed", "--midias",
                                                  jpgs[0], "--legenda", " ".join(f"#t{i}" for i in range(31))], espera=1, env=env)
 

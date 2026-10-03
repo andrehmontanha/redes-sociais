@@ -10,6 +10,34 @@ prévia e espera. A aprovação é registrada com nome, horário e a impressão 
 exata do que foi aprovado; o publicador recusa qualquer coisa que tenha mudado
 depois disso.
 
+## Onde publica: o webapp (padrão)
+
+O estúdio é o **motor**: gera, revisa e põe na fila local. Quem aprova, agenda e
+publica é o **webapp** (`webapp/`, na Vercel), que fica no ar sem depender de uma
+sessão do Claude:
+
+```bash
+python .claude/skills/publicar-instagram/scripts/fila.py criar ...            # item local, como sempre
+python .claude/skills/publicar-instagram/scripts/enviar_webapp.py enviar clientes/<handle>/fila/<item>
+python .claude/skills/publicar-instagram/scripts/enviar_webapp.py enviar --cliente <handle> --todos
+python .claude/skills/publicar-instagram/scripts/enviar_webapp.py status --cliente <handle>
+```
+
+- Item em rascunho ou aguardando aprovação chega ao webapp **aguardando aprovação**:
+  a equipe aprova lá, em `/fila`, vendo a prévia e digitando o nome. Mande o link.
+- Item já aprovado no estúdio (`fila.py aprovar`, com o "ok" explícito no chat) leva
+  a aprovação junto; o webapp recalcula a impressão digital sobre os bytes e recusa
+  se não bater.
+- Depois de enviado, o `post.json` ganha o campo `webapp` e o `publicar.py` recusa o
+  item — nunca publicam os dois.
+- Post com **avatar digital** não vai ao webapp (a checagem de consentimento é daqui):
+  segue o fluxo abaixo, pelo `publicar.py`.
+- Precisa de `ESTUDIO_API_CHAVE` (a mesma da Vercel) no `.env`, `cd webapp && npm install`
+  uma vez, e rede liberada para o domínio do webapp, `vercel.com` e `*.blob.vercel-storage.com`.
+
+O restante desta skill descreve a fila local e o `publicar.py`, que continuam valendo
+para avatar e como alternativa sem o webapp.
+
 ## Pré-requisitos (uma vez por cliente)
 
 Leia `references/configuracao-meta.md`. Em resumo:
